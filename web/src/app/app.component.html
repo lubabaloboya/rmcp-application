@@ -65,10 +65,7 @@
 </main>
 
 @if (isProcessing()) {
-  <div class="processing-overlay" role="status" aria-live="polite" aria-label="Processing request">
-    <div class="processing-card">
-      <span class="spinner" aria-hidden="true"></span>
-      <span>Processing...</span>
-    </div>
+  <div class="top-progress" role="status" aria-live="polite" aria-label="Processing request">
+    <span class="top-progress-bar" aria-hidden="true"></span>
   </div>
 }

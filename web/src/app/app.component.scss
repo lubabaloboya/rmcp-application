@@ -113,41 +113,33 @@ h1 {
 	gap: 1rem;
 }
 
-.processing-overlay {
+.top-progress {
 	position: fixed;
-	inset: 0;
-	background: rgba(237, 246, 255, 0.55);
-	display: grid;
-	place-items: center;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	overflow: hidden;
 	z-index: 3000;
-	backdrop-filter: blur(1px);
+	pointer-events: none;
+	background: rgba(230, 242, 255, 0.65);
 }
 
-.processing-card {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.7rem;
-	padding: 0.7rem 1rem;
-	border: 1px solid #9ec6e8;
-	background: #ffffff;
-	color: #0f4f80;
-	font-weight: 600;
-	box-shadow: 0 8px 20px rgba(26, 73, 110, 0.12);
+.top-progress-bar {
+	display: block;
+	width: 38%;
+	height: 100%;
+	background: linear-gradient(90deg, #2f79b2 0%, #7db7de 100%);
+	animation: rmcp-progress-slide 1s ease-in-out infinite;
+	transform: translateX(-120%);
 }
 
-.spinner {
-	width: 1rem;
-	height: 1rem;
-	border: 2px solid #c6def2;
-	border-top-color: #2f79b2;
-	border-right-color: #2f79b2;
-	border-radius: 50%;
-	animation: rmcp-spin 0.75s linear infinite;
-}
-
-@keyframes rmcp-spin {
-	to {
-		transform: rotate(360deg);
+@keyframes rmcp-progress-slide {
+	0% {
+		transform: translateX(-120%);
+	}
+	100% {
+		transform: translateX(300%);
 	}
 }
 
