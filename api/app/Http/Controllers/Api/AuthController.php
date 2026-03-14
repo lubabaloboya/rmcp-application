@@ -51,7 +51,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $user = auth('api')->user();
+        $user = JWTAuth::setToken($token)->toUser();
         if ($user instanceof User) {
             $user->load('role');
         }

@@ -39,7 +39,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <span class="user">{{ userName() || 'RMCP User' }}</span>
+        <span class="user">{{ userName() }}</span>
         <button type="button" class="ghost" (click)="logout()">Logout</button>
       </div>
     </aside>
@@ -63,3 +63,12 @@
 
   <app-toast-container />
 </main>
+
+@if (isProcessing()) {
+  <div class="processing-overlay" role="status" aria-live="polite" aria-label="Processing request">
+    <div class="processing-card">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>Processing...</span>
+    </div>
+  </div>
+}

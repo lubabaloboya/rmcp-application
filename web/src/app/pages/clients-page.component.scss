@@ -6,7 +6,7 @@
 .panel {
   background: #fffaf2;
   border: 1px solid #dbcdb4;
-  border-radius: 1rem;
+  border-radius: 0;
   padding: 1rem;
 }
 
@@ -39,13 +39,13 @@ input,
 select {
   background: #fff;
   border: 1px solid #c9bca5;
-  border-radius: 0.6rem;
+  border-radius: 0;
   padding: 0.56rem 0.62rem;
 }
 
 button {
   border: none;
-  border-radius: 0.7rem;
+  border-radius: 0;
   background: #0d7a72;
   color: #fff;
   padding: 0.66rem 0.95rem;
@@ -73,7 +73,7 @@ button:disabled {
 
 .risk-grid div {
   border: 1px solid #cec1aa;
-  border-radius: 0.7rem;
+  border-radius: 0;
   padding: 0.6rem;
   display: grid;
   gap: 0.25rem;
@@ -135,7 +135,7 @@ button:disabled {
   position: relative;
   display: inline-flex;
   align-items: center;
-  border-radius: 0.6rem;
+  border-radius: 0;
   background: #ece2d0;
   color: #2f3c40;
   padding: 0.3rem 0.55rem;
@@ -151,7 +151,7 @@ button:disabled {
 
 .expiry-pill {
   display: inline-block;
-  border-radius: 999px;
+  border-radius: 0;
   font-size: 0.74rem;
   font-weight: 600;
   padding: 0.2rem 0.56rem;
@@ -204,7 +204,7 @@ th {
 
 .risk-pill {
   display: inline-block;
-  border-radius: 999px;
+  border-radius: 0;
   padding: 0.18rem 0.5rem;
   font-size: 0.75rem;
   text-transform: uppercase;

@@ -17,6 +17,26 @@ export class DashboardPageComponent implements OnInit {
   readonly dashboard = signal<DashboardData | null>(null);
   readonly incidentCount = computed(() => this.dashboard()?.recent_incidents.length ?? 0);
   readonly screeningMatchCount = computed(() => this.dashboard()?.recent_screening_matches.length ?? 0);
+  readonly metrics = computed(() => {
+    const dashboard = this.dashboard();
+
+    return [
+      { key: 'total', label: 'Total Clients', value: dashboard?.total_clients ?? 0, tone: 'info' },
+      { key: 'risk', label: 'High Risk Clients', value: dashboard?.high_risk_clients ?? 0, tone: 'danger' },
+      { key: 'tasks', label: 'Pending Tasks', value: dashboard?.pending_tasks ?? 0, tone: 'accent' },
+      { key: 'docs', label: 'Documents Expiring', value: dashboard?.documents_expiring ?? 0, tone: 'warn' },
+      { key: 'blocked', label: 'Blocked Clients', value: dashboard?.blocked_clients ?? 0, tone: 'danger' },
+    ];
+  });
+  readonly maxMetricValue = computed(() => Math.max(1, ...this.metrics().map((metric) => metric.value)));
+  readonly chartData = computed(() => {
+    const max = this.maxMetricValue();
+
+    return this.metrics().map((metric) => ({
+      ...metric,
+      percent: Math.max(6, Math.round((metric.value / max) * 100)),
+    }));
+  });
 
   ngOnInit(): void {
     this.loadData();

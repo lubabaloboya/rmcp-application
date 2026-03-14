@@ -1,20 +1,22 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 interface LoginResponse {
   token: string;
   user: {
-    name: string;
+    name?: string | null;
+    email?: string | null;
     role_name?: string | null;
     permissions?: string[];
   };
 }
 
 interface AuthMeResponse {
-  name: string;
+  name?: string | null;
+  email?: string | null;
   role_name?: string | null;
   permissions?: string[];
 }
@@ -37,7 +39,7 @@ export class AuthService {
       tap((response) => {
         this.setSession(
           response.token,
-          response.user?.name ?? 'RMCP User',
+          this.resolveDisplayName(response.user?.name, response.user?.email ?? credentials.email),
           response.user?.role_name ?? '',
           response.user?.permissions ?? []
         );
@@ -53,7 +55,7 @@ export class AuthService {
 
     return this.http.get<AuthMeResponse>(`${this.apiBase}/auth/me`, { headers: this.authHeaders() }).pipe(
       tap((user) => {
-        this.userName.set(user?.name ?? 'RMCP User');
+        this.userName.set(this.resolveDisplayName(user?.name, user?.email));
         this.userRole.set(user?.role_name ?? '');
         this.permissions.set(user?.permissions ?? []);
       }),
@@ -62,15 +64,27 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    if (!this.token()) {
-      this.clearSession();
+    const token = this.token();
+    this.clearSession();
+
+    if (!token) {
       return of(void 0);
     }
 
-    return this.http.post(`${this.apiBase}/auth/logout`, {}).pipe(
-      tap(() => this.clearSession()),
-      map(() => void 0)
-    );
+    return this.http
+      .post(
+        `${this.apiBase}/auth/logout`,
+        {},
+        {
+          headers: new HttpHeaders({
+            Authorization: `Bearer ${token}`,
+          }),
+        }
+      )
+      .pipe(
+        catchError(() => of(null)),
+        map(() => void 0)
+      );
   }
 
   clearSession(): void {
@@ -104,5 +118,19 @@ export class AuthService {
     return new HttpHeaders({
       Authorization: `Bearer ${this.token()}`,
     });
+  }
+
+  private resolveDisplayName(name?: string | null, email?: string | null): string {
+    const safeName = (name ?? '').trim();
+    if (safeName.length > 0) {
+      return safeName;
+    }
+
+    const safeEmail = (email ?? '').trim();
+    if (safeEmail.includes('@')) {
+      return safeEmail.split('@')[0];
+    }
+
+    return 'Account';
   }
 }

@@ -2,10 +2,10 @@
 	display: block;
 	min-height: 100vh;
 	background:
-		radial-gradient(circle at 10% 5%, #ead7b4 0%, transparent 38%),
-		radial-gradient(circle at 90% 20%, #cde7e1 0%, transparent 30%),
-		linear-gradient(160deg, #f8f3eb 0%, #efe4d2 65%, #ebdcc7 100%);
-	color: #1f2a30;
+		radial-gradient(circle at 12% 8%, #d9efff 0%, transparent 42%),
+		radial-gradient(circle at 88% 18%, #eef7ff 0%, transparent 36%),
+		linear-gradient(160deg, #f7fbff 0%, #edf6ff 65%, #e6f1ff 100%);
+	color: #143248;
 	font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
 }
 
@@ -24,11 +24,11 @@
 }
 
 .panel {
-	background: #fffaf2;
-	border: 1px solid #dbcdb4;
-	border-radius: 1rem;
+	background: #ffffff;
+	border: 1px solid #c7ddf0;
+	border-radius: 0;
 	padding: 1rem;
-	box-shadow: 0 10px 28px rgba(31, 42, 48, 0.08);
+	box-shadow: 0 8px 20px rgba(26, 73, 110, 0.08);
 }
 
 .eyebrow {
@@ -67,30 +67,30 @@ h1 {
 
 .ghost {
 	background: transparent;
-	color: #1f2a30;
-	border: 1px solid #b6aa95;
-	border-radius: 0.7rem;
+	color: #143248;
+	border: 1px solid #9dbddd;
+	border-radius: 0;
 	padding: 0.52rem 0.8rem;
 	cursor: pointer;
 }
 
 .nav-links a {
 	text-decoration: none;
-	color: #36545a;
+	color: #1b4868;
 	border: 1px solid transparent;
-	border-radius: 0.7rem;
+	border-radius: 0;
 	padding: 0.42rem 0.62rem;
 }
 
 .nav-links a.active {
-	color: #0d7a72;
-	border-color: #b7d8d5;
-	background: #e8f4f2;
+	color: #0f4f80;
+	border-color: #9ec6e8;
+	background: #e6f2ff;
 }
 
 .user {
 	font-size: 0.9rem;
-	color: #4f5f64;
+	color: #3b5f79;
 }
 
 .sidebar-footer {
@@ -111,6 +111,44 @@ h1 {
 	width: 100%;
 	display: grid;
 	gap: 1rem;
+}
+
+.processing-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(237, 246, 255, 0.55);
+	display: grid;
+	place-items: center;
+	z-index: 3000;
+	backdrop-filter: blur(1px);
+}
+
+.processing-card {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.7rem;
+	padding: 0.7rem 1rem;
+	border: 1px solid #9ec6e8;
+	background: #ffffff;
+	color: #0f4f80;
+	font-weight: 600;
+	box-shadow: 0 8px 20px rgba(26, 73, 110, 0.12);
+}
+
+.spinner {
+	width: 1rem;
+	height: 1rem;
+	border: 2px solid #c6def2;
+	border-top-color: #2f79b2;
+	border-right-color: #2f79b2;
+	border-radius: 50%;
+	animation: rmcp-spin 0.75s linear infinite;
+}
+
+@keyframes rmcp-spin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 @media (max-width: 760px) {

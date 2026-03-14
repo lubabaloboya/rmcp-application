@@ -63,7 +63,7 @@ class TaskController extends Controller
         $task->update($validated);
         AuditLogService::log(auth('api')->id(), 'update', 'tasks', $task->id);
 
-        return response()->json($task->fresh()->load('assignee:id,name,email'));
+        return response()->json($task->load('assignee:id,name,email'));
     }
 
     public function destroy(TaskItem $task): JsonResponse

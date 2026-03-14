@@ -1,24 +1,30 @@
 <section class="stats-grid">
-  <article class="stat-card panel">
-    <h3>Total Clients</h3>
-    <p class="metric">{{ dashboard()?.total_clients ?? 0 }}</p>
-  </article>
-  <article class="stat-card panel danger">
-    <h3>High Risk Clients</h3>
-    <p class="metric">{{ dashboard()?.high_risk_clients ?? 0 }}</p>
-  </article>
-  <article class="stat-card panel">
-    <h3>Pending Tasks</h3>
-    <p class="metric">{{ dashboard()?.pending_tasks ?? 0 }}</p>
-  </article>
-  <article class="stat-card panel">
-    <h3>Documents Expiring</h3>
-    <p class="metric">{{ dashboard()?.documents_expiring ?? 0 }}</p>
-  </article>
-  <article class="stat-card panel warning">
-    <h3>Blocked Clients</h3>
-    <p class="metric">{{ dashboard()?.blocked_clients ?? 0 }}</p>
-  </article>
+  @for (metric of chartData(); track metric.key) {
+    <article class="stat-card panel" [class]="'stat-card panel ' + metric.tone">
+      <h3>{{ metric.label }}</h3>
+      <p class="metric">{{ metric.value }}</p>
+      <div class="spark-track" aria-hidden="true">
+        <span class="spark-fill" [style.width.%]="metric.percent"></span>
+      </div>
+    </article>
+  }
+</section>
+
+<section class="panel chart-panel">
+  <h3>Portfolio Snapshot</h3>
+  <p class="chart-caption">Visual comparison of current client and compliance load.</p>
+
+  <div class="bar-chart">
+    @for (metric of chartData(); track metric.key) {
+      <div class="bar-row">
+        <span class="bar-label">{{ metric.label }}</span>
+        <div class="bar-track" aria-hidden="true">
+          <span class="bar-fill" [class]="'bar-fill ' + metric.tone" [style.width.%]="metric.percent"></span>
+        </div>
+        <span class="bar-value">{{ metric.value }}</span>
+      </div>
+    }
+  </div>
 </section>
 
 <section class="panel">
