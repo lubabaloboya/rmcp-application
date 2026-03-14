@@ -1,0 +1,161 @@
+<section class="panel summary-grid">
+  <article>
+    <h3>Total Recent Incidents</h3>
+    <p class="metric">{{ incidents().length }}</p>
+  </article>
+  <article>
+    <h3>Open Incidents</h3>
+    <p class="metric">{{ openCount() }}</p>
+  </article>
+  <article>
+    <h3>High Severity</h3>
+    <p class="metric">{{ highSeverityCount() }}</p>
+  </article>
+</section>
+
+<section class="panel">
+  <h3>Report Incident</h3>
+  <form [formGroup]="form" (ngSubmit)="createIncident()" class="create-grid">
+    <label>
+      Incident Type
+      <input type="text" formControlName="incident_type" placeholder="Sanctions Alert" />
+    </label>
+
+    <label>
+      Severity
+      <select formControlName="severity">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+    </label>
+
+    <label>
+      Status
+      <select formControlName="status">
+        <option value="open">Open</option>
+        <option value="pending">Pending</option>
+        <option value="resolved">Resolved</option>
+        <option value="closed">Closed</option>
+      </select>
+    </label>
+
+    <label class="full-width">
+      Description
+      <textarea rows="3" formControlName="description" placeholder="Incident details..."></textarea>
+    </label>
+
+    <button type="submit" [disabled]="submitting()">{{ submitting() ? 'Saving...' : 'Create Incident' }}</button>
+  </form>
+</section>
+
+<section class="panel filters">
+  <h3>Filters</h3>
+  <div class="filter-grid">
+    <label>
+      Status
+      <select [value]="status()" (change)="setStatus($any($event.target).value)">
+        <option value="">All</option>
+        <option value="open">Open</option>
+        <option value="pending">Pending</option>
+        <option value="resolved">Resolved</option>
+        <option value="closed">Closed</option>
+      </select>
+    </label>
+
+    <label>
+      Severity
+      <select [value]="severity()" (change)="setSeverity($any($event.target).value)">
+        <option value="">All</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+    </label>
+
+    <label>
+      Created From
+      <input type="date" [value]="createdFrom()" (change)="setCreatedFrom($any($event.target).value)" />
+    </label>
+
+    <label>
+      Created To
+      <input type="date" [value]="createdTo()" (change)="setCreatedTo($any($event.target).value)" />
+    </label>
+
+    <label>
+      Sort By
+      <select [value]="sortBy()" (change)="setSortBy($any($event.target).value)">
+        <option value="created_at">Created Date</option>
+        <option value="severity">Severity</option>
+        <option value="status">Status</option>
+        <option value="incident_type">Incident Type</option>
+      </select>
+    </label>
+
+    <label>
+      Direction
+      <select [value]="sortDir()" (change)="setSortDir($any($event.target).value)">
+        <option value="desc">Descending</option>
+        <option value="asc">Ascending</option>
+      </select>
+    </label>
+
+    <label>
+      Per Page
+      <select [value]="perPage()" (change)="setPerPage(+$any($event.target).value)">
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+        <option [value]="50">50</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="filter-actions">
+    <button type="button" (click)="applyFilters()">Apply</button>
+    <button type="button" class="ghost" (click)="resetFilters()">Reset</button>
+  </div>
+</section>
+
+<section class="panel">
+  <h3>Incident Feed</h3>
+  <ul class="incident-list">
+    @for (incident of incidents(); track $index) {
+      <li>
+        <div>
+          <strong>{{ incident.incident_type }}</strong>
+          <span>{{ incident.status }} | {{ incident.severity }}</span>
+          <span>{{ incident.description }}</span>
+          <span>Reporter: {{ incident.reporter?.name || 'Unknown' }}</span>
+          <div class="inline-actions">
+            <select #statusSelect [value]="incident.status">
+              <option value="open">Open</option>
+              <option value="pending">Pending</option>
+              <option value="resolved">Resolved</option>
+              <option value="closed">Closed</option>
+            </select>
+            <button type="button" class="ghost" (click)="updateIncidentStatus(incident.id, statusSelect.value)">Update Status</button>
+          </div>
+        </div>
+      </li>
+    } @empty {
+      <li>No incidents match the selected filters.</li>
+    }
+  </ul>
+</section>
+
+<section class="panel pager">
+  <p>Showing page {{ currentPage() }} of {{ lastPage() }} ({{ total() }} total)</p>
+  <div class="pager-actions">
+    <button type="button" class="ghost" [disabled]="currentPage() <= 1" (click)="goToPreviousPage()">Previous</button>
+    <button type="button" [disabled]="currentPage() >= lastPage()" (click)="goToNextPage()">Next</button>
+  </div>
+</section>
+
+@if (loading()) {
+  <section class="panel status">Loading incidents...</section>
+}
+
+@if (errorMessage()) {
+  <section class="panel status error">{{ errorMessage() }}</section>
+}

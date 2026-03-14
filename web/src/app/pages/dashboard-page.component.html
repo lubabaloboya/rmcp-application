@@ -1,0 +1,58 @@
+<section class="stats-grid">
+  <article class="stat-card panel">
+    <h3>Total Clients</h3>
+    <p class="metric">{{ dashboard()?.total_clients ?? 0 }}</p>
+  </article>
+  <article class="stat-card panel danger">
+    <h3>High Risk Clients</h3>
+    <p class="metric">{{ dashboard()?.high_risk_clients ?? 0 }}</p>
+  </article>
+  <article class="stat-card panel">
+    <h3>Pending Tasks</h3>
+    <p class="metric">{{ dashboard()?.pending_tasks ?? 0 }}</p>
+  </article>
+  <article class="stat-card panel">
+    <h3>Documents Expiring</h3>
+    <p class="metric">{{ dashboard()?.documents_expiring ?? 0 }}</p>
+  </article>
+  <article class="stat-card panel warning">
+    <h3>Blocked Clients</h3>
+    <p class="metric">{{ dashboard()?.blocked_clients ?? 0 }}</p>
+  </article>
+</section>
+
+<section class="panel">
+  <h3>Recent Incidents ({{ incidentCount() }})</h3>
+  <ul class="incident-list">
+    @for (incident of dashboard()?.recent_incidents ?? []; track $index) {
+      <li>
+        <strong>{{ incident.incident_type }}</strong>
+        <span>{{ incident.severity }} | {{ incident.status }}</span>
+      </li>
+    } @empty {
+      <li>No incidents reported.</li>
+    }
+  </ul>
+</section>
+
+<section class="panel">
+  <h3>Recent Screening Matches ({{ screeningMatchCount() }})</h3>
+  <ul class="incident-list">
+    @for (item of dashboard()?.recent_screening_matches ?? []; track $index) {
+      <li>
+        <strong>Client #{{ item.client_id }} | {{ item.check_type }}</strong>
+        <span>{{ item.status }} | {{ item.provider || 'provider-n/a' }} | {{ item.checked_at || '-' }}</span>
+      </li>
+    } @empty {
+      <li>No recent screening matches.</li>
+    }
+  </ul>
+</section>
+
+@if (loading()) {
+  <section class="panel status">Loading dashboard...</section>
+}
+
+@if (errorMessage()) {
+  <section class="panel status error">{{ errorMessage() }}</section>
+}

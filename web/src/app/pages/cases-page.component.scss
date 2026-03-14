@@ -1,0 +1,13 @@
+:host { display:grid; gap:1rem; }
+.panel { background:#fffaf2; border:1px solid #dbcdb4; border-radius:1rem; padding:1rem; }
+.grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; }
+.full { grid-column:1 / -1; }
+label { display:grid; gap:.3rem; font-size:.85rem; color:#4f5f64; }
+input, button { font:inherit; }
+input { border:1px solid #c9bca5; border-radius:.6rem; padding:.5rem .6rem; }
+button { border:none; border-radius:.7rem; background:#0d7a72; color:#fff; padding:.55rem .8rem; cursor:pointer; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+th,td { border-bottom:1px solid #d9ccb6; padding:.55rem .4rem; }
+.actions { display:flex; flex-wrap:wrap; gap:.4rem; }
+@media (max-width:640px){ .grid { grid-template-columns:1fr; } }

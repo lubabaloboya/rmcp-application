@@ -1,0 +1,32 @@
+<section class="panel">
+  <h3>Tasks</h3>
+  <form [formGroup]="form" (ngSubmit)="createTask()" class="grid">
+    <input type="text" formControlName="title" placeholder="Task title" />
+    <input type="text" formControlName="description" placeholder="Description" />
+    <select formControlName="status"><option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="done">Done</option></select>
+    <input type="date" formControlName="due_date" />
+    <button type="submit">Create</button>
+  </form>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Title</th><th>Status</th><th>Due</th><th>Actions</th></tr></thead>
+      <tbody>
+        @for (t of tasks(); track t.id) {
+          <tr>
+            <td>{{ t.title }}</td>
+            <td>{{ t.status }}</td>
+            <td>{{ t.due_date || '-' }}</td>
+            <td>
+              <button type="button" (click)="setStatus(t, 'in_progress')">Start</button>
+              <button type="button" (click)="setStatus(t, 'done')">Done</button>
+              <button type="button" class="danger" (click)="deleteTask(t)">Delete</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4">No tasks.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

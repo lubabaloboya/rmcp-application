@@ -1,0 +1,15 @@
+<section class="panel">
+  <h3>Communications</h3>
+  <form [formGroup]="form" (ngSubmit)="createCommunication()" class="grid">
+    <input type="text" formControlName="sender" placeholder="Sender" />
+    <input type="text" formControlName="receiver" placeholder="Receiver" />
+    <input type="text" formControlName="email_subject" placeholder="Subject" />
+    <input type="text" formControlName="email_body" placeholder="Message" />
+    <button type="submit">Save</button>
+  </form>
+  <ul>
+    @for (item of communications(); track item.id) {
+      <li><strong>{{ item.email_subject || 'No Subject' }}</strong> - {{ item.sender }} to {{ item.receiver }}</li>
+    } @empty { <li>No communications yet.</li> }
+  </ul>
+</section>

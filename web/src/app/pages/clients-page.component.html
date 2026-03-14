@@ -1,0 +1,214 @@
+<section class="content-grid">
+  <article class="panel">
+    <h3>Add Client</h3>
+    <form [formGroup]="form" (ngSubmit)="createClient()" class="form-grid compact">
+      <label>
+        Company
+        <select formControlName="company_id">
+          @if (companies().length === 0) {
+            <option [value]="0">No companies available</option>
+          } @else {
+            @for (company of companies(); track company.id) {
+              <option [value]="company.id">{{ company.company_name }} (ID: {{ company.id }})</option>
+            }
+          }
+        </select>
+      </label>
+      <label>
+        Client Type
+        <select formControlName="client_type">
+          <option value="individual">Individual</option>
+          <option value="corporate">Corporate</option>
+        </select>
+      </label>
+      <label>
+        First Name
+        <input type="text" formControlName="first_name" />
+      </label>
+      <label>
+        Last Name
+        <input type="text" formControlName="last_name" />
+      </label>
+      <label>
+        Email
+        <input type="email" formControlName="email" />
+      </label>
+      <label>
+        Phone
+        <input type="text" formControlName="phone" />
+      </label>
+      <label class="full-width">
+        Address
+        <input type="text" formControlName="address" />
+      </label>
+      <button type="submit" [disabled]="loading() || companies().length === 0">{{ loading() ? 'Saving...' : 'Create Client' }}</button>
+    </form>
+  </article>
+
+  <article class="panel">
+    <h3>Risk Distribution</h3>
+    <div class="risk-grid">
+      <div><span>Low</span><strong>{{ lowCount() }}</strong></div>
+      <div><span>Medium</span><strong>{{ mediumCount() }}</strong></div>
+      <div><span>High</span><strong>{{ highCount() }}</strong></div>
+    </div>
+  </article>
+</section>
+
+<section class="panel">
+  <h3>Bulk Upload Clients (Excel)</h3>
+  <p>Upload .xlsx/.xls file with columns: company_id, client_type, first_name, last_name, email, phone, address, id_number, passport_number.</p>
+  <div class="bulk-actions">
+    <button type="button" class="ghost" (click)="downloadBulkTemplate()">Download Template</button>
+    <input type="file" accept=".xlsx,.xls,.csv" (change)="onBulkFileSelected($event)" [disabled]="bulkUploading() || companies().length === 0" />
+  </div>
+  @if (bulkUploading()) {
+    <p>Uploading and validating rows...</p>
+  }
+</section>
+
+<section class="panel">
+  <h3>Upload RMCP Documents</h3>
+  <p>Attach ID, passport, proof of address, and other KYC documents to a selected client record.</p>
+
+  <form [formGroup]="documentForm" (ngSubmit)="uploadDocument(documentFileInput)" class="document-grid">
+    <label>
+      Client
+      <select formControlName="client_id" (change)="onDocumentClientChanged($any($event.target).value)">
+        @if (clients().length === 0) {
+          <option [value]="0">No clients available</option>
+        } @else {
+          @for (client of clients(); track client.id) {
+            <option [value]="client.id">{{ clientDisplayName(client) }} (ID: {{ client.id }})</option>
+          }
+        }
+      </select>
+    </label>
+
+    <label>
+      Document Type
+      <select formControlName="document_type_id">
+        @if (documentTypes().length === 0) {
+          <option [value]="0">No document types available</option>
+        } @else {
+          @for (type of documentTypes(); track type.id) {
+            <option [value]="type.id">{{ type.document_name }} ({{ type.category }})</option>
+          }
+        }
+      </select>
+    </label>
+
+    <label>
+      Expiry Date (Optional)
+      <input type="date" formControlName="expiry_date" />
+    </label>
+
+    <label class="full-width">
+      Select File
+      <input #documentFileInput type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onDocumentFileSelected($event)" />
+    </label>
+
+    <div class="document-actions full-width">
+      <button type="submit" [disabled]="uploadingDocument() || documentForm.invalid || !selectedDocumentFileName()">
+        {{ uploadingDocument() ? 'Uploading...' : 'Upload Document' }}
+      </button>
+      <span class="file-name">{{ selectedDocumentFileName() || 'No file selected' }}</span>
+    </div>
+  </form>
+
+  @if (loadingDocuments()) {
+    <p>Loading client documents...</p>
+  }
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Document Type</th>
+          <th>File</th>
+          <th>Expiry</th>
+          <th>Status</th>
+          <th>Uploaded</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (document of clientDocuments(); track document.id) {
+          <tr>
+            <td>{{ document.document_type_name || '-' }}</td>
+            <td>{{ document.file_name }}</td>
+            <td>{{ document.expiry_date || '-' }}</td>
+            <td><span [class]="expiryBadgeClass(document)">{{ expiryBadgeLabel(document) }}</span></td>
+            <td>{{ document.created_at ? (document.created_at | date:'medium') : '-' }}</td>
+            <td>
+              <div class="row-actions">
+                <a class="download-link" [href]="documentDownloadUrl(document)" target="_blank" rel="noopener">Download</a>
+
+                <label class="inline-upload">
+                  <span>{{ replacingDocumentId() === document.id ? 'Replacing...' : 'Replace' }}</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    (change)="replaceDocument(document, $event)"
+                    [disabled]="replacingDocumentId() === document.id || deletingDocumentId() === document.id"
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  class="danger"
+                  [disabled]="deletingDocumentId() === document.id || replacingDocumentId() === document.id"
+                  (click)="deleteDocument(document)">
+                  {{ deletingDocumentId() === document.id ? 'Deleting...' : 'Delete' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6">No documents uploaded for this client yet.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <h3>Clients</h3>
+  @if (loadingList()) {
+    <p>Refreshing clients list...</p>
+  }
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Risk</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (client of clients(); track client.id) {
+          <tr>
+            <td>{{ client.first_name || '-' }} {{ client.last_name || '' }}</td>
+            <td>{{ client.client_type }}</td>
+            <td>{{ client.email || '-' }}</td>
+            <td>{{ client.phone || '-' }}</td>
+            <td><span class="risk-pill" [class]="'risk-pill ' + client.risk_level">{{ client.risk_level }}</span></td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5">No clients yet.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+@if (errorMessage()) {
+  <section class="panel error">{{ errorMessage() }}</section>
+}

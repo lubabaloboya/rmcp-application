@@ -1,0 +1,30 @@
+<section class="panel"><h3>Directors</h3>
+  <form [formGroup]="directorForm" (ngSubmit)="addDirector()" class="grid">
+    <input type="number" formControlName="company_id" placeholder="Company ID" />
+    <input type="text" formControlName="first_name" placeholder="First name" />
+    <input type="text" formControlName="last_name" placeholder="Last name" />
+    <input type="text" formControlName="position" placeholder="Position" />
+    <button type="submit">Add Director</button>
+  </form>
+  <ul>@for (d of directors(); track d.id) { <li>{{ d.first_name }} {{ d.last_name }} <button type="button" (click)="deleteDirector(d)">Delete</button></li> }</ul>
+</section>
+
+<section class="panel"><h3>Shareholders</h3>
+  <form [formGroup]="shareholderForm" (ngSubmit)="addShareholder()" class="grid">
+    <input type="number" formControlName="company_id" placeholder="Company ID" />
+    <input type="text" formControlName="shareholder_name" placeholder="Name" />
+    <input type="number" formControlName="ownership_percentage" placeholder="Ownership %" />
+    <button type="submit">Add Shareholder</button>
+  </form>
+  <ul>@for (s of shareholders(); track s.id) { <li>{{ s.shareholder_name }} ({{ s.ownership_percentage }}%) <button type="button" (click)="deleteShareholder(s)">Delete</button></li> }</ul>
+</section>
+
+<section class="panel"><h3>Beneficial Owners</h3>
+  <form [formGroup]="ownerForm" (ngSubmit)="addOwner()" class="grid">
+    <input type="number" formControlName="company_id" placeholder="Company ID" />
+    <input type="text" formControlName="name" placeholder="Name" />
+    <input type="number" formControlName="ownership_percentage" placeholder="Ownership %" />
+    <button type="submit">Add Owner</button>
+  </form>
+  <ul>@for (o of owners(); track o.id) { <li>{{ o.name }} ({{ o.ownership_percentage }}%) <button type="button" (click)="deleteOwner(o)">Delete</button></li> }</ul>
+</section>

@@ -1,0 +1,150 @@
+<section class="panel">
+  <h3>Compliance Automation Control</h3>
+  <p>Manage risk rules, required document checklists, and run screening workflows from one place.</p>
+</section>
+
+<section class="grid-two">
+  <article class="panel">
+    <h4>Risk Scoring Rules</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rule</th>
+            <th>Enabled</th>
+            <th>Weight</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (rule of riskRules(); track rule.id) {
+            <tr>
+              <td>{{ rule.label }}</td>
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="rule.enabled"
+                  [disabled]="savingRuleId() === rule.id"
+                  (change)="updateRule(rule, 'enabled', $any($event.target).checked)"
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  min="0"
+                  max="200"
+                  [value]="rule.weight"
+                  [disabled]="savingRuleId() === rule.id"
+                  (change)="updateRule(rule, 'weight', +$any($event.target).value)"
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  [value]="rule.description || ''"
+                  [disabled]="savingRuleId() === rule.id"
+                  (blur)="updateRule(rule, 'description', $any($event.target).value)"
+                />
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4">No risk rules found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="panel">
+    <h4>Mandatory Document Checklist</h4>
+
+    <div class="switches">
+      <button type="button" class="ghost" [class.active]="checklistClientType() === 'individual'" (click)="loadChecklist('individual')">Individual</button>
+      <button type="button" class="ghost" [class.active]="checklistClientType() === 'company'" (click)="loadChecklist('company')">Company</button>
+    </div>
+
+    <div class="checklist-grid">
+      @for (type of documentTypes(); track type.id) {
+        <label>
+          <input type="checkbox" [checked]="requiredTypeIds().includes(type.id)" (change)="toggleRequiredType(type.id)" />
+          {{ type.document_name }}
+        </label>
+      } @empty {
+        <p>No document types found.</p>
+      }
+    </div>
+
+    <button type="button" [disabled]="savingChecklist()" (click)="saveChecklist()">
+      {{ savingChecklist() ? 'Saving...' : 'Save Checklist' }}
+    </button>
+  </article>
+</section>
+
+<section class="panel">
+  <h4>Screening Operations</h4>
+
+  <div class="screening-controls">
+    <label>
+      Client
+      <select [value]="selectedClientId()" (change)="onClientChange($any($event.target).value)">
+        @for (client of clients(); track client.id) {
+          <option [value]="client.id">{{ (client.first_name || '') + ' ' + (client.last_name || '') }} (ID: {{ client.id }})</option>
+        } @empty {
+          <option [value]="0">No clients available</option>
+        }
+      </select>
+    </label>
+
+    <button type="button" [disabled]="screeningInProgress() || selectedClientId() <= 0" (click)="runManualScreening()">
+      {{ screeningInProgress() ? 'Running...' : 'Run Manual Screening' }}
+    </button>
+  </div>
+
+  @if (latestAssessment(); as assessment) {
+    <article class="assessment-card">
+      <h5>Latest Risk Output for {{ selectedClientName() }}</h5>
+      <p><strong>Level:</strong> {{ assessment.risk_level }} | <strong>Score:</strong> {{ assessment.risk_score }}</p>
+      <p><strong>Trigger:</strong> {{ assessment.trigger_reason || '-' }}</p>
+      <ul>
+        @for (reason of assessment.explanation_json || []; track reason.rule_key) {
+          <li>{{ reason.label }} (+{{ reason.weight }})</li>
+        } @empty {
+          <li>No explanation entries.</li>
+        }
+      </ul>
+    </article>
+  }
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Matched</th>
+          <th>Score</th>
+          <th>Cycle</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of screeningHistory(); track row.id) {
+          <tr>
+            <td>{{ row.checked_at || '-' }}</td>
+            <td>{{ row.check_type }}</td>
+            <td>{{ row.status }}</td>
+            <td>{{ row.matched ? 'Yes' : 'No' }}</td>
+            <td>{{ row.score }}</td>
+            <td>{{ row.monitoring_cycle }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6">No screening history for selected client.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,65 @@
+<main class="rmcp-shell" [class.authenticated]="isAuthenticated()">
+  @if (isAuthenticated()) {
+    <aside class="sidebar panel">
+      <div class="brand-block">
+        <p class="eyebrow">Risk Management & Compliance Platform</p>
+        <h1>RMCP Control Center</h1>
+      </div>
+
+      <nav class="nav-links">
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        @if (hasPermission('clients.view')) {
+          <a routerLink="/clients" routerLinkActive="active">Clients</a>
+        }
+        @if (hasPermission('cases.view')) {
+          <a routerLink="/cases" routerLinkActive="active">Cases</a>
+        }
+        @if (hasPermission('directors.view')) {
+          <a routerLink="/governance" routerLinkActive="active">Governance</a>
+        }
+        @if (hasPermission('incidents.view')) {
+          <a routerLink="/incidents" routerLinkActive="active">Incidents</a>
+        }
+        @if (hasPermission('tasks.view')) {
+          <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+        }
+        @if (hasPermission('communications.view')) {
+          <a routerLink="/communications" routerLinkActive="active">Comms</a>
+        }
+        @if (hasPermission('companies.view')) {
+          <a routerLink="/companies" routerLinkActive="active">Companies</a>
+        }
+        @if (hasPermission('audit_logs.view')) {
+          <a routerLink="/audit-logs" routerLinkActive="active">Audit</a>
+        }
+        @if (hasPermission('roles.view')) {
+          <a routerLink="/roles" routerLinkActive="active">Roles</a>
+          <a routerLink="/compliance-automation" routerLinkActive="active">Compliance</a>
+        }
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="user">{{ userName() || 'RMCP User' }}</span>
+        <button type="button" class="ghost" (click)="logout()">Logout</button>
+      </div>
+    </aside>
+
+    <section class="content-area">
+      @if (booting()) {
+        <section class="panel">Loading session...</section>
+      } @else {
+        <router-outlet />
+      }
+    </section>
+  } @else {
+    <section class="auth-area">
+      @if (booting()) {
+        <section class="panel">Loading session...</section>
+      } @else {
+        <router-outlet />
+      }
+    </section>
+  }
+
+  <app-toast-container />
+</main>

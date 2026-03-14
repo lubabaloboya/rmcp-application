@@ -1,0 +1,134 @@
+:host {
+	display: block;
+	min-height: 100vh;
+	background:
+		radial-gradient(circle at 10% 5%, #ead7b4 0%, transparent 38%),
+		radial-gradient(circle at 90% 20%, #cde7e1 0%, transparent 30%),
+		linear-gradient(160deg, #f8f3eb 0%, #efe4d2 65%, #ebdcc7 100%);
+	color: #1f2a30;
+	font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+}
+
+.rmcp-shell {
+	max-width: 1320px;
+	margin: 0 auto;
+	padding: 1rem;
+	display: grid;
+	gap: 1rem;
+	min-height: 100vh;
+}
+
+.rmcp-shell.authenticated {
+	grid-template-columns: 270px minmax(0, 1fr);
+	align-items: start;
+}
+
+.panel {
+	background: #fffaf2;
+	border: 1px solid #dbcdb4;
+	border-radius: 1rem;
+	padding: 1rem;
+	box-shadow: 0 10px 28px rgba(31, 42, 48, 0.08);
+}
+
+.eyebrow {
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	font-size: 0.72rem;
+	margin: 0;
+}
+
+
+h1 {
+	margin: 0;
+	font-size: clamp(1.2rem, 2.3vw, 1.7rem);
+}
+
+.sidebar {
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+	gap: 1rem;
+	position: sticky;
+	top: 1rem;
+	max-height: calc(100vh - 2rem);
+}
+
+.brand-block {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.nav-links {
+	display: grid;
+	gap: 0.35rem;
+	overflow: auto;
+	padding-right: 0.25rem;
+}
+
+.ghost {
+	background: transparent;
+	color: #1f2a30;
+	border: 1px solid #b6aa95;
+	border-radius: 0.7rem;
+	padding: 0.52rem 0.8rem;
+	cursor: pointer;
+}
+
+.nav-links a {
+	text-decoration: none;
+	color: #36545a;
+	border: 1px solid transparent;
+	border-radius: 0.7rem;
+	padding: 0.42rem 0.62rem;
+}
+
+.nav-links a.active {
+	color: #0d7a72;
+	border-color: #b7d8d5;
+	background: #e8f4f2;
+}
+
+.user {
+	font-size: 0.9rem;
+	color: #4f5f64;
+}
+
+.sidebar-footer {
+	display: grid;
+	gap: 0.55rem;
+}
+
+.content-area {
+	min-width: 0;
+	display: grid;
+	gap: 1rem;
+	padding-bottom: 2rem;
+}
+
+.auth-area {
+	max-width: 1120px;
+	margin: 0 auto;
+	width: 100%;
+	display: grid;
+	gap: 1rem;
+}
+
+@media (max-width: 760px) {
+	.rmcp-shell.authenticated {
+		grid-template-columns: 1fr;
+	}
+
+	.sidebar {
+		position: static;
+		max-height: none;
+	}
+
+	.nav-links {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.sidebar-footer {
+		grid-template-columns: 1fr auto;
+		align-items: center;
+	}
+}

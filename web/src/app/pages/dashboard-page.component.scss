@@ -1,0 +1,67 @@
+:host {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  background: #fffaf2;
+  border: 1px solid #dbcdb4;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #4f5f64;
+}
+
+.metric {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.6rem 0 0;
+}
+
+.stat-card.danger {
+  border-color: #e6c0bf;
+  background: #fff2f2;
+}
+
+.stat-card.warning {
+  border-color: #ecd8b1;
+  background: #fff7e9;
+}
+
+.incident-list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.incident-list li {
+  border-left: 3px solid #c2b59f;
+  padding-left: 0.6rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.incident-list span {
+  color: #4f5f64;
+  font-size: 0.84rem;
+}
+
+.status {
+  color: #4f5f64;
+}
+
+.status.error {
+  color: #a12f2f;
+}

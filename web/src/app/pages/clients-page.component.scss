@@ -1,0 +1,246 @@
+:host {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  background: #fffaf2;
+  border: 1px solid #dbcdb4;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.84rem;
+  color: #4f5f64;
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input,
+select {
+  background: #fff;
+  border: 1px solid #c9bca5;
+  border-radius: 0.6rem;
+  padding: 0.56rem 0.62rem;
+}
+
+button {
+  border: none;
+  border-radius: 0.7rem;
+  background: #0d7a72;
+  color: #fff;
+  padding: 0.66rem 0.95rem;
+  cursor: pointer;
+}
+
+button.danger {
+  background: #b74242;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+
+.risk-grid div {
+  border: 1px solid #cec1aa;
+  border-radius: 0.7rem;
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.risk-grid span {
+  color: #4f5f64;
+  font-size: 0.8rem;
+}
+
+.risk-grid strong {
+  font-size: 1.2rem;
+}
+
+.bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.document-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 0.85rem;
+}
+
+.document-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.file-name {
+  color: #4f5f64;
+  font-size: 0.84rem;
+}
+
+.download-link {
+  color: #0d7a72;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.download-link:hover {
+  text-decoration: underline;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.inline-upload {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.6rem;
+  background: #ece2d0;
+  color: #2f3c40;
+  padding: 0.3rem 0.55rem;
+  cursor: pointer;
+}
+
+.inline-upload input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.expiry-pill {
+  display: inline-block;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.2rem 0.56rem;
+  white-space: nowrap;
+}
+
+.expiry-pill.valid {
+  background: #dff0e4;
+  color: #176b35;
+}
+
+.expiry-pill.expiring {
+  background: #f6eccd;
+  color: #8a5e1f;
+}
+
+.expiry-pill.expired {
+  background: #f7d7d7;
+  color: #8f2727;
+}
+
+.expiry-pill.none {
+  background: #e9e5dd;
+  color: #5f6668;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid #d9ccb6;
+  padding: 0.62rem 0.4rem;
+  font-size: 0.92rem;
+}
+
+th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #4f5f64;
+}
+
+.risk-pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.risk-pill.low {
+  background: #dff0e4;
+  color: #176b35;
+}
+
+.risk-pill.medium {
+  background: #f6eccd;
+  color: #8a5e1f;
+}
+
+.risk-pill.high {
+  background: #f7d7d7;
+  color: #8f2727;
+}
+
+.error {
+  color: #a12f2f;
+}
+
+@media (max-width: 900px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .document-grid {
+    grid-template-columns: 1fr;
+  }
+}

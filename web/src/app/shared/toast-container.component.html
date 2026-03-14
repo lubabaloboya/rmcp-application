@@ -1,0 +1,8 @@
+<section class="toasts" aria-live="polite" aria-atomic="true">
+  @for (item of toast.toasts(); track item.id) {
+    <article class="toast" [class]="'toast ' + item.type">
+      <span>{{ item.text }}</span>
+      <button type="button" (click)="toast.remove(item.id)" aria-label="Dismiss notification">x</button>
+    </article>
+  }
+</section>

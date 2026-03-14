@@ -1,0 +1,31 @@
+<section class="hero">
+  <div>
+    <p class="eyebrow">Risk Management & Compliance Platform</p>
+    <h1>RMCP Control Center</h1>
+    <p>Sign in to access dashboard analytics and client monitoring tools.</p>
+  </div>
+  <div class="chips">
+    <span>Docker Ready</span>
+    <span>SQL Server</span>
+    <span>JWT</span>
+  </div>
+</section>
+
+<section class="panel auth-panel">
+  <h2>Sign In</h2>
+  <form [formGroup]="form" (ngSubmit)="login()" class="form-grid">
+    <label>
+      Email
+      <input type="email" formControlName="email" placeholder="admin@rmcp.local" />
+    </label>
+    <label>
+      Password
+      <input type="password" formControlName="password" placeholder="Admin@12345" />
+    </label>
+    <button type="submit" [disabled]="loading()">{{ loading() ? 'Signing in...' : 'Sign In' }}</button>
+  </form>
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+</section>

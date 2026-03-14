@@ -1,0 +1,17 @@
+<section class="panel">
+  <h3>Roles & Permission Matrix</h3>
+  @for (role of roles(); track role.id) {
+    <article class="role-card">
+      <h4>{{ role.role_name }}</h4>
+      @if (savingRoleId() === role.id) { <p>Saving...</p> }
+      <div class="perm-grid">
+        @for (perm of catalog(); track perm) {
+          <label>
+            <input type="checkbox" [checked]="hasPermission(role, perm)" (change)="togglePermission(role, perm)" />
+            {{ perm }}
+          </label>
+        }
+      </div>
+    </article>
+  }
+</section>

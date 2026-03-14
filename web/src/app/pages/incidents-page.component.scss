@@ -1,0 +1,174 @@
+:host {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  background: #fffaf2;
+  border: 1px solid #dbcdb4;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+}
+
+.summary-grid h3 {
+  margin: 0;
+  color: #4f5f64;
+  font-size: 0.92rem;
+}
+
+.create-grid {
+  margin-top: 0.7rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.metric {
+  margin: 0.55rem 0 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.filters h3 {
+  margin: 0;
+}
+
+.filter-grid {
+  margin-top: 0.7rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.84rem;
+  color: #4f5f64;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  background: #fff;
+  border: 1px solid #c9bca5;
+  border-radius: 0.6rem;
+  padding: 0.52rem 0.62rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.filter-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.pager p {
+  margin: 0;
+  color: #4f5f64;
+}
+
+.pager-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+button {
+  border: none;
+  border-radius: 0.7rem;
+  background: #0d7a72;
+  color: #fff;
+  padding: 0.6rem 0.88rem;
+  cursor: pointer;
+}
+
+button.ghost {
+  background: transparent;
+  color: #1f2a30;
+  border: 1px solid #b6aa95;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.incident-list {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.incident-list li {
+  border-left: 3px solid #c2b59f;
+  padding-left: 0.6rem;
+}
+
+.inline-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  align-items: center;
+}
+
+.incident-list span {
+  display: block;
+  color: #4f5f64;
+  font-size: 0.84rem;
+  margin-top: 0.2rem;
+}
+
+.status {
+  color: #4f5f64;
+}
+
+.status.error {
+  color: #a12f2f;
+}
+
+@media (max-width: 920px) {
+  .create-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .create-grid,
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pager {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
