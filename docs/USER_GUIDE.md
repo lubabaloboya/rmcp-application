@@ -57,6 +57,18 @@ If a section is missing, your role does not have access to that feature.
 
 ## 6. Core Workflows
 
+### 6.6 Compliance Automation (User-Friendly)
+
+The Compliance Automation page provides a central dashboard for managing compliance rules, document checklists, and client screening:
+
+- **Summary Cards:** At the top, see quick stats for total risk rules, clients, and checklist types.
+- **Risk Scoring Rules:** View, search, and edit risk rules. Enable/disable rules, adjust weights, and edit descriptions. Tooltips explain key fields.
+- **Mandatory Document Checklist:** Switch between Individual/Company, select required document types, and save. Visual feedback and clear buttons make it easy to manage requirements.
+- **Screening Operations:** Search/select a client, run manual screening, and view the latest risk assessment (level, score, trigger, explanation). All actions have clear feedback and are easy to find.
+- **Enhanced Usability:** Improved section headers, tooltips, search/filter for rules and clients, and modern summary cards make compliance management fast and intuitive.
+
+This page is designed for compliance officers and admins to efficiently manage and evidence compliance activities.
+
 ### 6.1 Client Onboarding
 
 1. Go to Clients.

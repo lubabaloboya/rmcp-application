@@ -15,6 +15,10 @@ class TaskController extends Controller
         $validated = $request->validate([
             'status' => ['nullable', 'string', 'max:50'],
             'assigned_to' => ['nullable', 'integer'],
+            'q' => ['nullable', 'string', 'max:255'],
+            'sort_by' => ['nullable', 'in:created_at,due_date,status,title'],
+            'sort_dir' => ['nullable', 'in:asc,desc'],
+            'per_page' => ['nullable', 'integer', 'min:5', 'max:100'],
         ]);
 
         $query = TaskItem::query()->with('assignee:id,name,email')->latest('id');
@@ -27,7 +31,21 @@ class TaskController extends Controller
             $query->where('assigned_to', (int) $validated['assigned_to']);
         }
 
-        return response()->json($query->paginate(20));
+        if (! empty($validated['q'])) {
+            $term = trim($validated['q']);
+            $query->where(function ($inner) use ($term): void {
+                $inner->where('title', 'like', "%{$term}%")
+                    ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
+
+        $sortBy = $validated['sort_by'] ?? 'created_at';
+        $sortDir = $validated['sort_dir'] ?? 'desc';
+        $perPage = (int) ($validated['per_page'] ?? 20);
+
+        $query->reorder()->orderBy($sortBy, $sortDir);
+
+        return response()->json($query->paginate($perPage)->withQueryString());
     }
 
     public function store(Request $request): JsonResponse

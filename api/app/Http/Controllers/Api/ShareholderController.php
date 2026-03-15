@@ -30,6 +30,20 @@ class ShareholderController extends Controller
             'ownership_percentage' => ['required', 'numeric', 'min:0', 'max:100'],
         ]);
 
+        $currentTotal = (float) Shareholder::query()
+            ->where('company_id', (int) $validated['company_id'])
+            ->sum('ownership_percentage');
+
+        $requested = (float) $validated['ownership_percentage'];
+        if (($currentTotal + $requested) > 100.0) {
+            return response()->json([
+                'message' => 'Total shareholder ownership cannot exceed 100% for this company.',
+                'current_total' => round($currentTotal, 2),
+                'requested' => round($requested, 2),
+                'remaining' => max(0, round(100.0 - $currentTotal, 2)),
+            ], 422);
+        }
+
         $shareholder = Shareholder::query()->create($validated);
         AuditLogService::log(auth('api')->id(), 'create', 'shareholders', $shareholder->id);
 
@@ -42,6 +56,23 @@ class ShareholderController extends Controller
             'shareholder_name' => ['sometimes', 'required', 'string', 'max:255'],
             'ownership_percentage' => ['sometimes', 'required', 'numeric', 'min:0', 'max:100'],
         ]);
+
+        if (array_key_exists('ownership_percentage', $validated)) {
+            $currentTotalExcludingRecord = (float) Shareholder::query()
+                ->where('company_id', $shareholder->company_id)
+                ->where('id', '!=', $shareholder->id)
+                ->sum('ownership_percentage');
+
+            $requested = (float) $validated['ownership_percentage'];
+            if (($currentTotalExcludingRecord + $requested) > 100.0) {
+                return response()->json([
+                    'message' => 'Total shareholder ownership cannot exceed 100% for this company.',
+                    'current_total' => round($currentTotalExcludingRecord, 2),
+                    'requested' => round($requested, 2),
+                    'remaining' => max(0, round(100.0 - $currentTotalExcludingRecord, 2)),
+                ], 422);
+            }
+        }
 
         $shareholder->update($validated);
         AuditLogService::log(auth('api')->id(), 'update', 'shareholders', $shareholder->id);

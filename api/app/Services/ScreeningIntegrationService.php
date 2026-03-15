@@ -54,7 +54,7 @@ class ScreeningIntegrationService
      */
     private function performCheck(string $type, Client $client): array
     {
-        $endpoint = config("services.screening.{$type}.url");
+        $endpoint = config(key: "services.screening.{$type}.url");
 
         if (is_string($endpoint) && $endpoint !== '') {
             try {

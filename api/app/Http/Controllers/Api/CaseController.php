@@ -23,7 +23,10 @@ class CaseController extends Controller
             'stage' => ['nullable', 'string'],
             'client_id' => ['nullable', 'integer'],
             'escalated' => ['nullable', 'boolean'],
+            'per_page' => ['nullable', 'integer', 'min:5', 'max:100'],
         ]);
+
+        $perPage = (int) ($validated['per_page'] ?? 20);
 
         $query = RmcpCase::query()
             ->with(['client:id,first_name,last_name,client_type', 'maker:id,name', 'checker:id,name'])
@@ -42,7 +45,7 @@ class CaseController extends Controller
             $validated['escalated'] ? $query->whereNotNull('escalated_at') : $query->whereNull('escalated_at');
         }
 
-        return response()->json($query->paginate(20));
+        return response()->json($query->paginate($perPage));
     }
 
     public function store(Request $request): JsonResponse
@@ -87,6 +90,12 @@ class CaseController extends Controller
 
     public function submitForReview(RmcpCase $case): JsonResponse
     {
+        if (! $this->canSubmitForReview($case)) {
+            return response()->json([
+                'message' => 'Only draft or rejected cases can be submitted for review.',
+            ], 422);
+        }
+
         $case->loadMissing('client');
         $this->documentGovernance->assertClientCanProceed($case->client, 'submit case for review');
 
@@ -103,8 +112,8 @@ class CaseController extends Controller
 
     public function startEnhancedDueDiligence(RmcpCase $case): JsonResponse
     {
-        if (! in_array($case->status, ['pending_review', 'draft'], true)) {
-            return response()->json(['message' => 'Only pending or draft cases can start EDD.'], 422);
+        if (! $this->canStartEdd($case)) {
+            return response()->json(['message' => 'Only pending review cases can start EDD.'], 422);
         }
 
         $case->loadMissing('client');
@@ -125,6 +134,10 @@ class CaseController extends Controller
         $validated = $request->validate([
             'review_notes' => ['nullable', 'string'],
         ]);
+
+        if (! $this->canApprove($case)) {
+            return response()->json(['message' => 'Only pending review or EDD in-progress cases can be approved.'], 422);
+        }
 
         $actorId = auth('api')->id();
         if ($actorId === $case->maker_id) {
@@ -153,6 +166,10 @@ class CaseController extends Controller
             'review_notes' => ['required', 'string'],
         ]);
 
+        if (! $this->canReject($case)) {
+            return response()->json(['message' => 'Only pending review or EDD in-progress cases can be rejected.'], 422);
+        }
+
         $actorId = auth('api')->id();
         if ($actorId === $case->maker_id) {
             return response()->json(['message' => 'Maker-checker policy violation.'], 422);
@@ -172,7 +189,7 @@ class CaseController extends Controller
 
     public function close(RmcpCase $case): JsonResponse
     {
-        if ($case->status !== 'approved') {
+        if (! $this->canClose($case)) {
             return response()->json(['message' => 'Only approved cases can be closed.'], 422);
         }
 
@@ -185,5 +202,32 @@ class CaseController extends Controller
         AuditLogService::log(auth('api')->id(), 'close', 'cases', $case->id);
 
         return response()->json($case->fresh());
+    }
+
+    private function canSubmitForReview(RmcpCase $case): bool
+    {
+        return in_array($case->status, ['draft', 'rejected'], true);
+    }
+
+    private function canStartEdd(RmcpCase $case): bool
+    {
+        return $case->status === 'pending_review' && $case->stage === 'onboarding_review';
+    }
+
+    private function canApprove(RmcpCase $case): bool
+    {
+        return in_array($case->status, ['pending_review', 'edd_in_progress'], true)
+            && in_array($case->stage, ['onboarding_review', 'enhanced_due_diligence'], true);
+    }
+
+    private function canReject(RmcpCase $case): bool
+    {
+        return in_array($case->status, ['pending_review', 'edd_in_progress'], true)
+            && in_array($case->stage, ['onboarding_review', 'enhanced_due_diligence'], true);
+    }
+
+    private function canClose(RmcpCase $case): bool
+    {
+        return $case->status === 'approved' && $case->stage === 'ongoing_monitoring';
     }
 }

@@ -27,7 +27,7 @@ class ClientController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'company_id' => ['required', 'exists:companies,id'],
+            'company_id' => ['nullable', 'integer', 'exists:companies,id'],
             'client_type' => ['required', 'in:individual,company'],
             'first_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
@@ -85,7 +85,7 @@ class ClientController extends Controller
             }
 
             $rowValidator = Validator::make($payload, [
-                'company_id' => ['required', 'exists:companies,id'],
+                'company_id' => ['nullable', 'integer', 'exists:companies,id'],
                 'client_type' => ['required', 'in:individual,company'],
                 'first_name' => ['nullable', 'string', 'max:255'],
                 'last_name' => ['nullable', 'string', 'max:255'],

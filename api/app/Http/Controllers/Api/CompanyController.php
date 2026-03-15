@@ -11,11 +11,61 @@ use Illuminate\Support\Facades\Cache;
 
 class CompanyController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:255'],
+            'per_page' => ['nullable', 'integer', 'min:5', 'max:100'],
+            'sort_by' => ['nullable', 'in:company_name,industry,email,created_at'],
+            'sort_dir' => ['nullable', 'in:asc,desc'],
+        ]);
+
+        $sortBy = $validated['sort_by'] ?? 'company_name';
+        $sortDir = $validated['sort_dir'] ?? 'asc';
+
+        $baseQuery = Company::query()
+            ->select([
+                'id',
+                'company_name',
+                'registration_number',
+                'tax_number',
+                'industry',
+                'address',
+                'phone',
+                'email',
+            ])
+            ->orderBy($sortBy, $sortDir);
+
+        if (! empty($validated['q'])) {
+            $term = trim($validated['q']);
+            $baseQuery->where(function ($inner) use ($term): void {
+                $inner->where('company_name', 'like', "%{$term}%")
+                    ->orWhere('registration_number', 'like', "%{$term}%")
+                    ->orWhere('tax_number', 'like', "%{$term}%")
+                    ->orWhere('industry', 'like', "%{$term}%")
+                    ->orWhere('email', 'like', "%{$term}%");
+            });
+        }
+
+        $usePagination = array_key_exists('per_page', $validated) || array_key_exists('q', $validated) || $request->has('page');
+
+        if ($usePagination) {
+            $perPage = (int) ($validated['per_page'] ?? 20);
+            return response()->json($baseQuery->paginate($perPage)->withQueryString());
+        }
+
         $companies = Cache::remember('api:companies:index', now()->addMinutes(5), static function () {
             return Company::query()
-                ->select(['id', 'company_name'])
+                ->select([
+                    'id',
+                    'company_name',
+                    'registration_number',
+                    'tax_number',
+                    'industry',
+                    'address',
+                    'phone',
+                    'email',
+                ])
                 ->orderBy('company_name')
                 ->get();
         });

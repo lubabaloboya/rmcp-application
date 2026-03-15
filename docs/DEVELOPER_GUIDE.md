@@ -216,3 +216,12 @@ docker compose logs --tail=200 api
 - Keep Angular guards aligned with backend permissions.
 - Prefer minimal focused patches to avoid regressions.
 - Validate after infra changes (API/web health, auth login probe, key workflows).
+## 7.1 Compliance Automation Page Improvements
+
+The Angular component for the Compliance Automation page (`web/src/app/pages/compliance-automation-page.component.ts` and `.html`) now includes:
+- **Summary cards** for quick compliance stats (rules, clients, checklist types)
+- **Filtering logic** for rules and clients (see `filteredRules`, `filteredClients`, `filterRules`, `filterClients`)
+- **Modern, user-friendly UI** with tooltips, search fields, and improved feedback
+- **Section headers and tooltips** for clarity
+
+These changes improve usability for compliance officers and admins, and provide a reference for implementing similar UI/UX patterns elsewhere in the app.

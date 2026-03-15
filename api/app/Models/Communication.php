@@ -17,4 +17,14 @@ class Communication extends Model
         'linked_client_id',
         'linked_task_id',
     ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'linked_client_id');
+    }
+
+    public function task()
+    {
+        return $this->belongsTo(TaskItem::class, 'linked_task_id');
+    }
 }
