@@ -110,6 +110,18 @@ class RiskScoringService
                 'weight' => 25,
                 'description' => 'Open-source adverse media checks found concerns.',
             ],
+            [
+                'rule_key' => 'wealth_profile_in_review',
+                'label' => 'Wealth profile under review',
+                'weight' => 15,
+                'description' => 'Wealth profile requires enhanced due diligence review.',
+            ],
+            [
+                'rule_key' => 'wealth_profile_rejected',
+                'label' => 'Wealth profile rejected',
+                'weight' => 35,
+                'description' => 'Wealth profile was rejected and indicates elevated risk.',
+            ],
         ];
     }
 }

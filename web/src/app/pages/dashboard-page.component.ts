@@ -23,6 +23,9 @@ export class DashboardPageComponent implements OnInit {
     return [
       { key: 'total', label: 'Total Clients', value: dashboard?.total_clients ?? 0, tone: 'info' },
       { key: 'risk', label: 'High Risk Clients', value: dashboard?.high_risk_clients ?? 0, tone: 'danger' },
+      { key: 'wealth-review', label: 'Wealth Profiles In Review', value: dashboard?.wealth_profiles_in_review ?? 0, tone: 'warn' },
+      { key: 'wealth-approved', label: 'Wealth Profiles Approved', value: dashboard?.wealth_profiles_approved ?? 0, tone: 'accent' },
+      { key: 'wealth-edd', label: 'EDD Cases', value: dashboard?.wealth_edd_cases ?? 0, tone: 'warn' },
       { key: 'tasks', label: 'Pending Tasks', value: dashboard?.pending_tasks ?? 0, tone: 'accent' },
       { key: 'docs', label: 'Documents Expiring', value: dashboard?.documents_expiring ?? 0, tone: 'warn' },
       { key: 'blocked', label: 'Blocked Clients', value: dashboard?.blocked_clients ?? 0, tone: 'danger' },

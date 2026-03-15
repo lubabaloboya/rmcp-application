@@ -1,5 +1,5 @@
 <section class="panel">
-  <h3>RMCP Lifecycle Cases</h3>
+  <h3>Wealth Client Lifecycle Cases</h3>
   <form [formGroup]="form" (ngSubmit)="createCase()" class="grid">
     <label>
       Client
@@ -29,11 +29,12 @@
             <td>{{ item.case_number }}</td>
             <td>{{ formatCaseClient(item) }}</td>
             <td>{{ item.title }}</td>
-            <td>{{ item.stage }}</td>
+            <td>{{ stageLabel(item.stage) }}</td>
             <td>{{ item.status }}</td>
             <td>{{ item.sla_due_at || '-' }}</td>
             <td class="actions">
               <button type="button" (click)="submitCase(item)">Submit</button>
+              <button type="button" (click)="startEdd(item)">Start EDD</button>
               <button type="button" (click)="approveCase(item)">Approve</button>
               <button type="button" (click)="rejectCase(item)">Reject</button>
               <button type="button" (click)="closeCase(item)">Close</button>

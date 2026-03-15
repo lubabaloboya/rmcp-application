@@ -64,6 +64,16 @@ export class CasesPageComponent implements OnInit {
     });
   }
 
+  startEdd(item: RmcpCaseRecord): void {
+    this.api.startCaseEdd(item.id).subscribe({
+      next: (updated) => {
+        this.patchCase(updated);
+        this.toast.success('Enhanced due diligence started.');
+      },
+      error: (e) => this.toast.error(e?.error?.message ?? 'Failed to start EDD.'),
+    });
+  }
+
   approveCase(item: RmcpCaseRecord): void {
     this.api.approveCase(item.id).subscribe({
       next: (updated) => {
@@ -144,6 +154,20 @@ export class CasesPageComponent implements OnInit {
     }
 
     return `Client #${item.client_id}`;
+  }
+
+  stageLabel(stage: string): string {
+    const map: Record<string, string> = {
+      onboarding_review: 'Onboarding Review',
+      enhanced_due_diligence: 'Enhanced Due Diligence',
+      compliance_committee: 'Compliance Committee',
+      ongoing_monitoring: 'Ongoing Monitoring',
+      approved: 'Approved',
+      rejected: 'Rejected',
+      closure: 'Closure',
+    };
+
+    return map[stage] ?? stage;
   }
 
   private patchCase(updated: RmcpCaseRecord): void {

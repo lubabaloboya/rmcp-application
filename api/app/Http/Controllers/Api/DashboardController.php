@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use App\Models\RmcpCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -89,6 +90,10 @@ class DashboardController extends Controller
             return [
                 'total_clients' => Client::count(),
                 'high_risk_clients' => Client::where('risk_level', 'high')->count(),
+                'wealth_profiles_pending' => Client::where('wealth_profile_status', 'pending')->count(),
+                'wealth_profiles_in_review' => Client::where('wealth_profile_status', 'in_review')->count(),
+                'wealth_profiles_approved' => Client::where('wealth_profile_status', 'approved')->count(),
+                'wealth_edd_cases' => RmcpCase::where('stage', 'enhanced_due_diligence')->count(),
                 'compliance_status' => 'In Progress',
                 'documents_expiring' => DB::table('documents')->whereDate('expiry_date', '<=', now()->addDays(30))->count(),
                 'blocked_clients' => $blockedClients,

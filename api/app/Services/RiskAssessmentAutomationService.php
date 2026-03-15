@@ -36,6 +36,8 @@ class RiskAssessmentAutomationService
             'industry_risk' => (bool) ($overrides['industry_risk'] ?? $existing?->industry_risk ?? false),
             'sanctions_check' => (bool) ($overrides['sanctions_check'] ?? $existing?->sanctions_check ?? false),
             'adverse_media_hit' => (bool) ($overrides['adverse_media_hit'] ?? false),
+            'wealth_profile_in_review' => (bool) (($overrides['wealth_profile_status'] ?? $client->wealth_profile_status) === 'in_review'),
+            'wealth_profile_rejected' => (bool) (($overrides['wealth_profile_status'] ?? $client->wealth_profile_status) === 'rejected'),
         ];
 
         // Screening hits always elevate risk indicators unless an explicit override was supplied.

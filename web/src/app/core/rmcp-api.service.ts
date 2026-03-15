@@ -9,6 +9,10 @@ export type RiskLevel = 'low' | 'medium' | 'high';
 export interface DashboardData {
   total_clients: number;
   high_risk_clients: number;
+  wealth_profiles_pending: number;
+  wealth_profiles_in_review: number;
+  wealth_profiles_approved: number;
+  wealth_edd_cases: number;
   compliance_status: string;
   documents_expiring: number;
   blocked_clients: number;
@@ -530,6 +534,10 @@ export class RmcpApiService {
 
   submitCase(caseId: number): Observable<RmcpCaseRecord> {
     return this.http.post<RmcpCaseRecord>(`${this.apiBase}/cases/${caseId}/submit`, {});
+  }
+
+  startCaseEdd(caseId: number): Observable<RmcpCaseRecord> {
+    return this.http.post<RmcpCaseRecord>(`${this.apiBase}/cases/${caseId}/start-edd`, {});
   }
 
   approveCase(caseId: number, review_notes?: string): Observable<RmcpCaseRecord> {

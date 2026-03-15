@@ -58,7 +58,7 @@ class CaseController extends Controller
         $case = RmcpCase::query()->create([
             ...$validated,
             'case_number' => 'CASE-'.Str::upper(Str::random(8)),
-            'stage' => 'onboarding',
+            'stage' => 'onboarding_review',
             'status' => 'draft',
             'maker_id' => auth('api')->id(),
             'sla_due_at' => $validated['sla_due_at'] ?? now()->addDays(7),
@@ -76,7 +76,7 @@ class CaseController extends Controller
             'description' => ['nullable', 'string'],
             'checker_id' => ['nullable', 'integer', 'exists:users,id'],
             'sla_due_at' => ['nullable', 'date'],
-            'stage' => ['nullable', 'in:onboarding,review_pending,approved,rejected,closure'],
+            'stage' => ['nullable', 'in:onboarding_review,enhanced_due_diligence,compliance_committee,approved,rejected,ongoing_monitoring,closure'],
         ]);
 
         $case->update($validated);
@@ -91,12 +91,31 @@ class CaseController extends Controller
         $this->documentGovernance->assertClientCanProceed($case->client, 'submit case for review');
 
         $case->update([
-            'stage' => 'review_pending',
+            'stage' => 'onboarding_review',
             'status' => 'pending_review',
             'submitted_at' => now(),
         ]);
 
         AuditLogService::log(auth('api')->id(), 'submit', 'cases', $case->id);
+
+        return response()->json($case->fresh());
+    }
+
+    public function startEnhancedDueDiligence(RmcpCase $case): JsonResponse
+    {
+        if (! in_array($case->status, ['pending_review', 'draft'], true)) {
+            return response()->json(['message' => 'Only pending or draft cases can start EDD.'], 422);
+        }
+
+        $case->loadMissing('client');
+        $this->documentGovernance->assertClientCanProceed($case->client, 'start enhanced due diligence');
+
+        $case->update([
+            'stage' => 'enhanced_due_diligence',
+            'status' => 'edd_in_progress',
+        ]);
+
+        AuditLogService::log(auth('api')->id(), 'start_edd', 'cases', $case->id);
 
         return response()->json($case->fresh());
     }
@@ -116,7 +135,7 @@ class CaseController extends Controller
         $this->documentGovernance->assertClientCanProceed($case->client, 'approve case');
 
         $case->update([
-            'stage' => 'approved',
+            'stage' => 'ongoing_monitoring',
             'status' => 'approved',
             'approved_at' => now(),
             'checker_id' => $actorId,

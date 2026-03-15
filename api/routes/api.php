@@ -41,6 +41,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/cases', [CaseController::class, 'store'])->middleware('permission:cases.create');
         Route::patch('/cases/{case}', [CaseController::class, 'update'])->middleware('permission:cases.edit');
         Route::post('/cases/{case}/submit', [CaseController::class, 'submitForReview'])->middleware('permission:cases.submit');
+        Route::post('/cases/{case}/start-edd', [CaseController::class, 'startEnhancedDueDiligence'])->middleware('permission:cases.edit');
         Route::post('/cases/{case}/approve', [CaseController::class, 'approve'])->middleware('permission:cases.approve');
         Route::post('/cases/{case}/reject', [CaseController::class, 'reject'])->middleware('permission:cases.approve');
         Route::post('/cases/{case}/close', [CaseController::class, 'close'])->middleware('permission:cases.close');
