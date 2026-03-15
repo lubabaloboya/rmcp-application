@@ -75,10 +75,10 @@
     <label>
       Client
       <select formControlName="client_id" (change)="onDocumentClientChanged($any($event.target).value)">
-        @if (clients().length === 0) {
+        @if (clientOptions().length === 0) {
           <option [value]="0">No clients available</option>
         } @else {
-          @for (client of clients(); track client.id) {
+          @for (client of clientOptions(); track client.id) {
             <option [value]="client.id">{{ clientDisplayName(client) }} (ID: {{ client.id }})</option>
           }
         }
@@ -176,6 +176,17 @@
 
 <section class="panel">
   <h3>Clients</h3>
+  <div class="clients-toolbar">
+    <label>
+      Per Page
+      <select [value]="perPage()" (change)="setPerPage(+$any($event.target).value)">
+        <option [value]="10">10</option>
+        <option [value]="15">15</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+      </select>
+    </label>
+  </div>
   @if (loadingList()) {
     <p>Refreshing clients list...</p>
   }
@@ -206,6 +217,14 @@
         }
       </tbody>
     </table>
+  </div>
+
+  <div class="pager" role="navigation" aria-label="Clients pagination">
+    <p>Showing page {{ currentPage() }}</p>
+    <div class="pager-actions">
+      <button type="button" class="ghost" [disabled]="!hasPreviousPage()" (click)="goToPreviousPage()">Previous</button>
+      <button type="button" [disabled]="!hasNextPage()" (click)="goToNextPage()">Next</button>
+    </div>
   </div>
 </section>
 

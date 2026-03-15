@@ -33,6 +33,11 @@ export class ClientsPageComponent implements OnInit {
   readonly bulkUploading = signal(false);
   readonly errorMessage = signal('');
   readonly clients = signal<ClientRecord[]>([]);
+  readonly clientOptions = signal<ClientRecord[]>([]);
+  readonly perPage = signal(15);
+  readonly currentPage = signal(1);
+  readonly hasNextPage = signal(false);
+  readonly hasPreviousPage = signal(false);
   readonly companies = signal<CompanyRecord[]>([]);
   readonly documentTypes = signal<DocumentTypeRecord[]>([]);
   readonly clientDocuments = signal<ClientDocumentRecord[]>([]);
@@ -68,8 +73,37 @@ export class ClientsPageComponent implements OnInit {
     if (this.auth.hasPermission('companies.view')) {
       this.loadCompanies();
     }
+    this.loadClientOptions();
     this.loadClients();
     this.loadDocumentTypes();
+  }
+
+  setPerPage(value: number): void {
+    if (!Number.isFinite(value) || value <= 0) {
+      return;
+    }
+
+    this.perPage.set(value);
+    this.currentPage.set(1);
+    this.loadClients();
+  }
+
+  goToPreviousPage(): void {
+    if (!this.hasPreviousPage()) {
+      return;
+    }
+
+    this.currentPage.update((page) => Math.max(1, page - 1));
+    this.loadClients();
+  }
+
+  goToNextPage(): void {
+    if (!this.hasNextPage()) {
+      return;
+    }
+
+    this.currentPage.update((page) => page + 1);
+    this.loadClients();
   }
 
   downloadBulkTemplate(): void {
@@ -147,6 +181,7 @@ export class ClientsPageComponent implements OnInit {
           next: (response) => {
             this.bulkUploading.set(false);
             this.toast.success(`Bulk import successful: ${response.created_count} clients added.`);
+            this.loadClientOptions();
             this.loadClients();
             input.value = '';
           },
@@ -202,17 +237,9 @@ export class ClientsPageComponent implements OnInit {
         });
         this.toast.success('Client created successfully.');
         this.loading.set(false);
-
-        // Optimistically prepend new client so UI responds immediately.
-        this.clients.update((list) => {
-          const updated = [created, ...list];
-
-          if (this.documentForm.controls.client_id.value <= 0) {
-            this.selectClientForDocuments(created.id);
-          }
-
-          return updated;
-        });
+        this.currentPage.set(1);
+        this.loadClientOptions(created.id);
+        this.loadClients(created.id);
       },
       error: () => {
         this.errorMessage.set('Unable to create client.');
@@ -222,28 +249,55 @@ export class ClientsPageComponent implements OnInit {
     });
   }
 
-  private loadClients(): void {
+  private loadClients(_preferredClientId?: number): void {
     this.loadingList.set(true);
     this.errorMessage.set('');
 
-    this.api.getClients().subscribe({
+    this.api.getClientsPage(this.currentPage(), this.perPage()).subscribe({
       next: (response) => {
-        this.clients.set(response);
-        const selected = this.documentForm.controls.client_id.value;
-        const selectedExists = response.some((client) => client.id === selected);
-
-        if (!selectedExists) {
-          const firstClientId = response[0]?.id ?? 0;
-          this.selectClientForDocuments(firstClientId);
-        } else if (selected > 0) {
-          this.loadClientDocuments(selected);
-        }
+        const pageItems = response.data ?? [];
+        this.clients.set(pageItems);
+        this.currentPage.set(response.current_page ?? this.currentPage());
+        this.hasNextPage.set(Boolean(response.next_page_url));
+        this.hasPreviousPage.set(Boolean(response.prev_page_url));
 
         this.loadingList.set(false);
       },
       error: () => {
         this.errorMessage.set('Failed to load clients.');
         this.loadingList.set(false);
+      },
+    });
+  }
+
+  private loadClientOptions(preferredClientId?: number): void {
+    this.api.getClients().subscribe({
+      next: (allClients) => {
+        this.clientOptions.set(allClients ?? []);
+
+        const selected = this.documentForm.controls.client_id.value;
+        const selectedExists = allClients.some((client) => client.id === selected);
+        const preferredExists = preferredClientId
+          ? allClients.some((client) => client.id === preferredClientId)
+          : false;
+
+        if (preferredExists && preferredClientId) {
+          this.selectClientForDocuments(preferredClientId);
+          return;
+        }
+
+        if (!selectedExists) {
+          const firstClientId = allClients[0]?.id ?? 0;
+          this.selectClientForDocuments(firstClientId);
+          return;
+        }
+
+        if (selected > 0) {
+          this.loadClientDocuments(selected);
+        }
+      },
+      error: () => {
+        this.toast.error('Failed to load clients.');
       },
     });
   }
@@ -427,12 +481,14 @@ export class ClientsPageComponent implements OnInit {
     const first = (client.first_name ?? '').trim();
     const last = (client.last_name ?? '').trim();
     const fullName = `${first} ${last}`.trim();
+    const companyName = this.companies().find((company) => company.id === client.company_id)?.company_name;
 
     if (fullName.length > 0) {
-      return fullName;
+      return companyName ? `${fullName} - ${companyName}` : fullName;
     }
 
-    return `${client.client_type} #${client.id}`;
+    const fallback = `${client.client_type} #${client.id}`;
+    return companyName ? `${fallback} - ${companyName}` : fallback;
   }
 
   documentDownloadUrl(document: ClientDocumentRecord): string {

@@ -16,9 +16,12 @@ class ClientController extends Controller
     {
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(Client::query()->latest('id')->simplePaginate(15));
+        $perPage = (int) $request->integer('per_page', 15);
+        $perPage = max(5, min($perPage, 100));
+
+        return response()->json(Client::query()->latest('id')->simplePaginate($perPage));
     }
 
     public function store(Request $request): JsonResponse

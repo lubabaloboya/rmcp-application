@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RmcpApiService, RmcpCaseRecord } from '../core/rmcp-api.service';
+import { ClientRecord, RmcpApiService, RmcpCaseRecord } from '../core/rmcp-api.service';
 import { ToastService } from '../core/toast.service';
 
 @Component({
@@ -17,6 +17,7 @@ export class CasesPageComponent implements OnInit {
   private readonly toast = inject(ToastService);
 
   readonly cases = signal<RmcpCaseRecord[]>([]);
+  readonly clients = signal<ClientRecord[]>([]);
   readonly loading = signal(false);
 
   readonly form = this.fb.nonNullable.group({
@@ -27,6 +28,7 @@ export class CasesPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loadClients();
     this.loadCases();
   }
 
@@ -109,6 +111,39 @@ export class CasesPageComponent implements OnInit {
         this.toast.error('Failed to load cases.');
       },
     });
+  }
+
+  private loadClients(): void {
+    this.api.getClients().subscribe({
+      next: (list) => {
+        this.clients.set(list ?? []);
+
+        const currentClientId = this.form.controls.client_id.value;
+        if (currentClientId <= 0 && list.length > 0) {
+          this.form.patchValue({ client_id: list[0].id });
+        }
+      },
+      error: () => this.toast.error('Failed to load clients.'),
+    });
+  }
+
+  formatClientLabel(client: ClientRecord): string {
+    const name = `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim();
+    return name ? `${name} (#${client.id})` : `Client #${client.id}`;
+  }
+
+  formatCaseClient(item: RmcpCaseRecord): string {
+    if (item.client) {
+      const name = `${item.client.first_name ?? ''} ${item.client.last_name ?? ''}`.trim();
+      return name ? `${name} (#${item.client.id})` : `Client #${item.client.id}`;
+    }
+
+    const client = this.clients().find((candidate) => candidate.id === item.client_id);
+    if (client) {
+      return this.formatClientLabel(client);
+    }
+
+    return `Client #${item.client_id}`;
   }
 
   private patchCase(updated: RmcpCaseRecord): void {

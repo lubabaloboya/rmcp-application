@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { EMPTY, Observable } from 'rxjs';
+import { expand, map, reduce, shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export type RiskLevel = 'low' | 'medium' | 'high';
@@ -25,6 +25,7 @@ export interface DashboardData {
 
 export interface ClientRecord {
   id: number;
+  company_id?: number;
   first_name: string | null;
   last_name: string | null;
   client_type: string;
@@ -91,6 +92,7 @@ export interface IncidentFilters {
 
 interface PaginatedClients {
   data: ClientRecord[];
+  next_page_url?: string | null;
 }
 
 interface PaginatedIncidents {
@@ -107,6 +109,14 @@ export interface IncidentPage {
   last_page: number;
   per_page: number;
   total: number;
+}
+
+export interface ClientsPage {
+  data: ClientRecord[];
+  current_page: number;
+  per_page: number;
+  next_page_url: string | null;
+  prev_page_url: string | null;
 }
 
 export interface CreateClientPayload {
@@ -322,7 +332,32 @@ export class RmcpApiService {
   }
 
   getClients(): Observable<ClientRecord[]> {
-    return this.http.get<PaginatedClients>(`${this.apiBase}/clients`).pipe(map((response) => response.data ?? []));
+    const perPage = 100;
+    const params = new HttpParams()
+      .set('per_page', String(perPage))
+      .set('page', '1');
+
+    return this.http.get<PaginatedClients>(`${this.apiBase}/clients`, { params }).pipe(
+      expand((response) => response.next_page_url ? this.http.get<PaginatedClients>(response.next_page_url) : EMPTY),
+      map((response) => response.data ?? []),
+      reduce((all, pageItems) => all.concat(pageItems), [] as ClientRecord[])
+    );
+  }
+
+  getClientsPage(page = 1, perPage = 15): Observable<ClientsPage> {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('per_page', String(perPage));
+
+    return this.http.get<ClientsPage>(`${this.apiBase}/clients`, { params }).pipe(
+      map((response) => ({
+        data: response.data ?? [],
+        current_page: response.current_page ?? page,
+        per_page: response.per_page ?? perPage,
+        next_page_url: response.next_page_url ?? null,
+        prev_page_url: response.prev_page_url ?? null,
+      }))
+    );
   }
 
   getCompanies(): Observable<CompanyRecord[]> {

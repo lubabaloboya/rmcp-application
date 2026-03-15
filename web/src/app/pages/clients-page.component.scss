@@ -182,6 +182,12 @@ button:disabled {
   overflow-x: auto;
 }
 
+.clients-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.7rem;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -229,6 +235,30 @@ th {
   color: #a12f2f;
 }
 
+.pager {
+  margin-top: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.pager p {
+  margin: 0;
+  color: #4f5f64;
+}
+
+.pager-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+button.ghost {
+  background: transparent;
+  color: #1f2a30;
+  border: 1px solid #b6aa95;
+}
+
 @media (max-width: 900px) {
   .content-grid {
     grid-template-columns: 1fr;
@@ -242,5 +272,10 @@ th {
 
   .document-grid {
     grid-template-columns: 1fr;
+  }
+
+  .pager {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
