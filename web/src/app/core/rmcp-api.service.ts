@@ -32,6 +32,12 @@ export interface ClientRecord {
   email: string | null;
   phone: string | null;
   risk_level: RiskLevel;
+  source_of_wealth?: string | null;
+  source_of_funds?: string | null;
+  annual_income_band?: string | null;
+  net_worth_band?: string | null;
+  investment_objective?: string | null;
+  wealth_profile_status?: 'pending' | 'in_review' | 'approved' | 'rejected';
 }
 
 export interface CompanyRecord {
@@ -122,11 +128,17 @@ export interface ClientsPage {
 export interface CreateClientPayload {
   company_id: number;
   client_type: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  address: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  source_of_wealth?: string;
+  source_of_funds?: string;
+  annual_income_band?: string;
+  net_worth_band?: string;
+  investment_objective?: string;
+  wealth_profile_status?: 'pending' | 'in_review' | 'approved' | 'rejected';
 }
 
 export interface BulkClientRow {
@@ -139,6 +151,12 @@ export interface BulkClientRow {
   email?: string;
   phone?: string;
   address?: string;
+  source_of_wealth?: string;
+  source_of_funds?: string;
+  annual_income_band?: string;
+  net_worth_band?: string;
+  investment_objective?: string;
+  wealth_profile_status?: 'pending' | 'in_review' | 'approved' | 'rejected';
 }
 
 export interface BulkCreateClientsPayload {

@@ -1,6 +1,6 @@
 <section class="content-grid">
   <article class="panel">
-    <h3>Add Client</h3>
+    <h3>Add Wealth Client</h3>
     <form [formGroup]="form" (ngSubmit)="createClient()" class="form-grid compact">
       <label>
         Company
@@ -18,7 +18,7 @@
         Client Type
         <select formControlName="client_type">
           <option value="individual">Individual</option>
-          <option value="corporate">Corporate</option>
+          <option value="company">Company</option>
         </select>
       </label>
       <label>
@@ -41,6 +41,47 @@
         Address
         <input type="text" formControlName="address" />
       </label>
+      <label>
+        Source of Wealth
+        <input type="text" formControlName="source_of_wealth" placeholder="Salary, business sale, inheritance" />
+      </label>
+      <label>
+        Source of Funds
+        <input type="text" formControlName="source_of_funds" placeholder="Monthly income, investment returns" />
+      </label>
+      <label>
+        Annual Income Band
+        <select formControlName="annual_income_band">
+          <option value="">Select band</option>
+          <option value="below_100k">Below 100k</option>
+          <option value="100k-500k">100k - 500k</option>
+          <option value="500k-2m">500k - 2m</option>
+          <option value="2m+">2m+</option>
+        </select>
+      </label>
+      <label>
+        Net Worth Band
+        <select formControlName="net_worth_band">
+          <option value="">Select band</option>
+          <option value="below_500k">Below 500k</option>
+          <option value="500k-2m">500k - 2m</option>
+          <option value="2m-10m">2m - 10m</option>
+          <option value="10m+">10m+</option>
+        </select>
+      </label>
+      <label>
+        Investment Objective
+        <input type="text" formControlName="investment_objective" placeholder="Growth, preservation, income" />
+      </label>
+      <label>
+        Wealth Profile Status
+        <select formControlName="wealth_profile_status">
+          <option value="pending">Pending</option>
+          <option value="in_review">In Review</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </label>
       <button type="submit" [disabled]="loading() || companies().length === 0">{{ loading() ? 'Saving...' : 'Create Client' }}</button>
     </form>
   </article>
@@ -57,7 +98,7 @@
 
 <section class="panel">
   <h3>Bulk Upload Clients (Excel)</h3>
-  <p>Upload .xlsx/.xls file with columns: company_id, client_type, first_name, last_name, email, phone, address, id_number, passport_number.</p>
+  <p>Upload .xlsx/.xls file with columns: company_id, client_type, first_name, last_name, email, phone, address, id_number, passport_number, source_of_wealth, source_of_funds, annual_income_band, net_worth_band, investment_objective, wealth_profile_status.</p>
   <div class="bulk-actions">
     <button type="button" class="ghost" (click)="downloadBulkTemplate()">Download Template</button>
     <input type="file" accept=".xlsx,.xls,.csv" (change)="onBulkFileSelected($event)" [disabled]="bulkUploading() || companies().length === 0" />
@@ -196,6 +237,8 @@
         <tr>
           <th>Name</th>
           <th>Type</th>
+          <th>Wealth Status</th>
+          <th>Source of Wealth</th>
           <th>Email</th>
           <th>Phone</th>
           <th>Risk</th>
@@ -206,13 +249,15 @@
           <tr>
             <td>{{ client.first_name || '-' }} {{ client.last_name || '' }}</td>
             <td>{{ client.client_type }}</td>
+            <td>{{ client.wealth_profile_status || 'pending' }}</td>
+            <td>{{ client.source_of_wealth || '-' }}</td>
             <td>{{ client.email || '-' }}</td>
             <td>{{ client.phone || '-' }}</td>
             <td><span class="risk-pill" [class]="'risk-pill ' + client.risk_level">{{ client.risk_level }}</span></td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="5">No clients yet.</td>
+            <td colspan="7">No clients yet.</td>
           </tr>
         }
       </tbody>

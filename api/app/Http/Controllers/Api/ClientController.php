@@ -36,6 +36,12 @@ class ClientController extends Controller
             'email' => ['nullable', 'email'],
             'phone' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string'],
+            'source_of_wealth' => ['nullable', 'string', 'max:255'],
+            'source_of_funds' => ['nullable', 'string', 'max:255'],
+            'annual_income_band' => ['nullable', 'string', 'max:100'],
+            'net_worth_band' => ['nullable', 'string', 'max:100'],
+            'investment_objective' => ['nullable', 'string', 'max:255'],
+            'wealth_profile_status' => ['nullable', 'in:pending,in_review,approved,rejected'],
         ]);
 
         $client = Client::create($validated);
@@ -66,6 +72,12 @@ class ClientController extends Controller
                 'email' => $row['email'] ?? null,
                 'phone' => $row['phone'] ?? null,
                 'address' => $row['address'] ?? null,
+                'source_of_wealth' => $row['source_of_wealth'] ?? null,
+                'source_of_funds' => $row['source_of_funds'] ?? null,
+                'annual_income_band' => $row['annual_income_band'] ?? null,
+                'net_worth_band' => $row['net_worth_band'] ?? null,
+                'investment_objective' => $row['investment_objective'] ?? null,
+                'wealth_profile_status' => $row['wealth_profile_status'] ?? 'pending',
             ];
 
             if (($payload['client_type'] ?? null) === 'corporate') {
@@ -82,6 +94,12 @@ class ClientController extends Controller
                 'email' => ['nullable', 'email'],
                 'phone' => ['nullable', 'string', 'max:50'],
                 'address' => ['nullable', 'string'],
+                'source_of_wealth' => ['nullable', 'string', 'max:255'],
+                'source_of_funds' => ['nullable', 'string', 'max:255'],
+                'annual_income_band' => ['nullable', 'string', 'max:100'],
+                'net_worth_band' => ['nullable', 'string', 'max:100'],
+                'investment_objective' => ['nullable', 'string', 'max:255'],
+                'wealth_profile_status' => ['nullable', 'in:pending,in_review,approved,rejected'],
             ]);
 
             if ($rowValidator->fails()) {
@@ -128,6 +146,12 @@ class ClientController extends Controller
             'email' => ['nullable', 'email'],
             'phone' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string'],
+            'source_of_wealth' => ['nullable', 'string', 'max:255'],
+            'source_of_funds' => ['nullable', 'string', 'max:255'],
+            'annual_income_band' => ['nullable', 'string', 'max:100'],
+            'net_worth_band' => ['nullable', 'string', 'max:100'],
+            'investment_objective' => ['nullable', 'string', 'max:255'],
+            'wealth_profile_status' => ['nullable', 'in:pending,in_review,approved,rejected'],
             'risk_level' => ['nullable', 'in:low,medium,high'],
         ]);
 

@@ -61,6 +61,12 @@ export class ClientsPageComponent implements OnInit {
     email: [''],
     phone: [''],
     address: [''],
+    source_of_wealth: [''],
+    source_of_funds: [''],
+    annual_income_band: [''],
+    net_worth_band: [''],
+    investment_objective: [''],
+    wealth_profile_status: ['pending' as const, [Validators.required]],
   });
 
   readonly documentForm = this.fb.nonNullable.group({
@@ -118,10 +124,16 @@ export class ClientsPageComponent implements OnInit {
         address: '1 Main Street',
         id_number: '9001015009087',
         passport_number: '',
+        source_of_wealth: 'Salary and investment portfolio',
+        source_of_funds: 'Monthly salary',
+        annual_income_band: '100k-500k',
+        net_worth_band: '500k-2m',
+        investment_objective: 'Capital preservation',
+        wealth_profile_status: 'pending',
       },
       {
         company_id: this.form.controls.company_id.value || '',
-        client_type: 'corporate',
+        client_type: 'company',
         first_name: '',
         last_name: '',
         email: 'corp@example.local',
@@ -129,6 +141,12 @@ export class ClientsPageComponent implements OnInit {
         address: '99 Corporate Ave',
         id_number: '',
         passport_number: '',
+        source_of_wealth: 'Business retained earnings',
+        source_of_funds: 'Corporate revenue',
+        annual_income_band: '2m+',
+        net_worth_band: '10m+',
+        investment_objective: 'Yield optimization',
+        wealth_profile_status: 'in_review',
       },
     ];
 
@@ -225,6 +243,7 @@ export class ClientsPageComponent implements OnInit {
     this.errorMessage.set('');
 
     const payload = this.form.getRawValue() as CreateClientPayload;
+    payload.client_type = payload.client_type === 'corporate' ? 'company' : payload.client_type;
 
     this.api.createClient(payload).subscribe({
       next: (created) => {
@@ -234,6 +253,12 @@ export class ClientsPageComponent implements OnInit {
           email: '',
           phone: '',
           address: '',
+          source_of_wealth: '',
+          source_of_funds: '',
+          annual_income_band: '',
+          net_worth_band: '',
+          investment_objective: '',
+          wealth_profile_status: 'pending',
         });
         this.toast.success('Client created successfully.');
         this.loading.set(false);
@@ -323,6 +348,12 @@ export class ClientsPageComponent implements OnInit {
       email: value('email') || undefined,
       phone: value('phone') || undefined,
       address: value('address') || undefined,
+      source_of_wealth: value('source_of_wealth') || undefined,
+      source_of_funds: value('source_of_funds') || undefined,
+      annual_income_band: value('annual_income_band') || undefined,
+      net_worth_band: value('net_worth_band') || undefined,
+      investment_objective: value('investment_objective') || undefined,
+      wealth_profile_status: (value('wealth_profile_status') as BulkClientRow['wealth_profile_status']) || 'pending',
     };
   }
 

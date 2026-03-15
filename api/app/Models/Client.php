@@ -19,7 +19,17 @@ class Client extends Model
         'email',
         'phone',
         'address',
+        'source_of_wealth',
+        'source_of_funds',
+        'annual_income_band',
+        'net_worth_band',
+        'investment_objective',
+        'wealth_profile_status',
         'risk_level',
+    ];
+
+    protected $casts = [
+        'wealth_profile_status' => 'string',
     ];
 
     public function riskAssessment()
