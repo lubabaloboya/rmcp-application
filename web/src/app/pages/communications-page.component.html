@@ -1,15 +1,143 @@
+<section class="panel hero">
+  <div>
+    <h2>Communications Register</h2>
+    <p>Log sender/receiver communication and keep every record linked to a client for traceability.</p>
+  </div>
+  <div class="hero-tip">
+    <strong>Control:</strong>
+    Client linkage is mandatory for all new communications.
+  </div>
+</section>
+
+<section class="panel summary-grid">
+  <article>
+    <h3>Total Records</h3>
+    <p class="metric">{{ totalCount() }}</p>
+  </article>
+  <article>
+    <h3>With Subject</h3>
+    <p class="metric">{{ withSubjectCount() }}</p>
+  </article>
+  <article>
+    <h3>Linked to Task</h3>
+    <p class="metric">{{ withTaskCount() }}</p>
+  </article>
+</section>
+
 <section class="panel">
-  <h3>Communications</h3>
+  <h3>Create Communication</h3>
   <form [formGroup]="form" (ngSubmit)="createCommunication()" class="grid">
-    <input type="text" formControlName="sender" placeholder="Sender" />
-    <input type="text" formControlName="receiver" placeholder="Receiver" />
-    <input type="text" formControlName="email_subject" placeholder="Subject" />
-    <input type="text" formControlName="email_body" placeholder="Message" />
-    <button type="submit">Save</button>
+    <label>
+      Linked Client
+      <select formControlName="linked_client_id" [class.invalid]="isFieldInvalid('linked_client_id')">
+        @if (clients().length === 0) {
+          <option [value]="0">No clients available</option>
+        } @else {
+          @for (client of clients(); track client.id) {
+            <option [value]="client.id">{{ clientDisplayName(client) }}</option>
+          }
+        }
+      </select>
+      @if (isFieldInvalid('linked_client_id')) {
+        <span class="field-error">{{ fieldError('linked_client_id') }}</span>
+      }
+    </label>
+
+    <label>
+      Sender Email
+      <input type="email" formControlName="sender" placeholder="sender@bank.local" [class.invalid]="isFieldInvalid('sender')" />
+      @if (isFieldInvalid('sender')) {
+        <span class="field-error">{{ fieldError('sender') }}</span>
+      }
+    </label>
+
+    <label>
+      Receiver Email
+      <input type="email" formControlName="receiver" placeholder="receiver@domain.local" [class.invalid]="isFieldInvalid('receiver')" />
+      @if (isFieldInvalid('receiver')) {
+        <span class="field-error">{{ fieldError('receiver') }}</span>
+      }
+    </label>
+
+    <label class="full-width">
+      Subject (Optional)
+      <input type="text" formControlName="email_subject" placeholder="e.g. KYC follow-up required" />
+    </label>
+
+    <label class="full-width">
+      Message (Optional)
+      <textarea rows="4" formControlName="email_body" placeholder="Communication content or summary"></textarea>
+    </label>
+
+    <div class="form-actions full-width">
+      <button type="submit" [disabled]="submitting() || clients().length === 0">{{ submitting() ? 'Saving...' : 'Save Communication' }}</button>
+      <p>Every saved communication is linked to the selected client.</p>
+    </div>
   </form>
-  <ul>
+</section>
+
+<section class="panel filters">
+  <h3>Search Communications</h3>
+  <div class="filter-row">
+    <input type="text" [value]="searchTerm()" (input)="setSearch($any($event.target).value)" placeholder="Search sender, receiver, subject, body, or client" />
+    <select [value]="selectedClientFilter()" (change)="setClientFilter($any($event.target).value)">
+      <option [value]="0">All Clients</option>
+      @for (client of clients(); track client.id) {
+        <option [value]="client.id">{{ clientDisplayName(client) }}</option>
+      }
+    </select>
+    <select [value]="sortBy()" (change)="setSortBy($any($event.target).value)">
+      <option value="created_at">Sort: Created Date</option>
+      <option value="sender">Sort: Sender</option>
+      <option value="receiver">Sort: Receiver</option>
+      <option value="email_subject">Sort: Subject</option>
+    </select>
+    <select [value]="sortDir()" (change)="setSortDir($any($event.target).value)">
+      <option value="desc">Descending</option>
+      <option value="asc">Ascending</option>
+    </select>
+    <select [value]="perPage()" (change)="setPerPage(+$any($event.target).value)">
+      <option [value]="10">10 / page</option>
+      <option [value]="20">20 / page</option>
+      <option [value]="50">50 / page</option>
+    </select>
+    <button type="button" (click)="applyFilters()">Apply</button>
+    <button type="button" class="ghost" (click)="clearSearch()">Clear</button>
+  </div>
+</section>
+
+<section class="panel">
+  <h3>Communication Feed</h3>
+
+  @if (loading()) {
+    <p>Loading communications...</p>
+  }
+
+  <ul class="communication-list">
     @for (item of communications(); track item.id) {
-      <li><strong>{{ item.email_subject || 'No Subject' }}</strong> - {{ item.sender }} to {{ item.receiver }}</li>
-    } @empty { <li>No communications yet.</li> }
+      <li>
+        <div class="communication-card">
+          <div class="card-header">
+            <strong>{{ item.email_subject || 'No Subject' }}</strong>
+            <span class="client-pill">{{ clientDisplayNameById(item.linked_client_id) }}</span>
+          </div>
+          <p class="from-to">{{ item.sender }} → {{ item.receiver }}</p>
+          @if (item.email_body) {
+            <p class="body">{{ item.email_body }}</p>
+          }
+          <p class="meta">Task Link: {{ item.task?.title || (item.linked_task_id ? ('Task #' + item.linked_task_id) : 'None') }}</p>
+        </div>
+      </li>
+    } @empty {
+      <li>No communications match your search.</li>
+    }
   </ul>
+</section>
+
+<section class="panel pager">
+  <p>Showing page {{ currentPage() }} of {{ lastPage() }} ({{ total() }} total)</p>
+  <div class="pager-actions">
+    <button type="button" class="ghost" [disabled]="currentPage() <= 1" (click)="goToPreviousPage()">Previous</button>
+    <button type="button" [disabled]="currentPage() >= lastPage()" (click)="goToNextPage()">Next</button>
+  </div>
 </section>

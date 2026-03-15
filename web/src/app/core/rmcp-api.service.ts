@@ -100,6 +100,30 @@ export interface IncidentFilters {
   page?: number;
 }
 
+export interface CaseFilters {
+  status?: string;
+  stage?: string;
+  client_id?: number;
+  per_page?: number;
+  page?: number;
+}
+
+interface PaginatedCases {
+  data: RmcpCaseRecord[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface CasesPage {
+  data: RmcpCaseRecord[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
 interface PaginatedClients {
   data: ClientRecord[];
   next_page_url?: string | null;
@@ -107,6 +131,30 @@ interface PaginatedClients {
 
 interface PaginatedIncidents {
   data: IncidentRecord[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+interface PaginatedTasks {
+  data: TaskRecord[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+interface PaginatedCommunications {
+  data: CommunicationRecord[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+interface PaginatedAuditLogs {
+  data: AuditLogRecord[];
   current_page: number;
   last_page: number;
   per_page: number;
@@ -121,6 +169,63 @@ export interface IncidentPage {
   total: number;
 }
 
+export interface TaskFilters {
+  status?: string;
+  assigned_to?: number;
+  q?: string;
+  sort_by?: 'created_at' | 'due_date' | 'status' | 'title';
+  sort_dir?: 'asc' | 'desc';
+  per_page?: number;
+  page?: number;
+}
+
+export interface TasksPage {
+  data: TaskRecord[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface CommunicationFilters {
+  linked_client_id?: number;
+  linked_task_id?: number;
+  q?: string;
+  sort_by?: 'created_at' | 'sender' | 'receiver' | 'email_subject';
+  sort_dir?: 'asc' | 'desc';
+  per_page?: number;
+  page?: number;
+}
+
+export interface CommunicationsPage {
+  data: CommunicationRecord[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface AuditLogFilters {
+  module?: string;
+  action?: string;
+  user_id?: number;
+  q?: string;
+  created_from?: string;
+  created_to?: string;
+  sort_by?: 'created_at' | 'module' | 'action' | 'record_id';
+  sort_dir?: 'asc' | 'desc';
+  per_page?: number;
+  page?: number;
+}
+
+export interface AuditLogsPage {
+  data: AuditLogRecord[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
 export interface ClientsPage {
   data: ClientRecord[];
   current_page: number;
@@ -129,8 +234,18 @@ export interface ClientsPage {
   prev_page_url: string | null;
 }
 
+export interface CompaniesPage {
+  data: CompanyRecord[];
+  current_page: number;
+  per_page: number;
+  last_page: number;
+  total: number;
+  next_page_url: string | null;
+  prev_page_url: string | null;
+}
+
 export interface CreateClientPayload {
-  company_id: number;
+  company_id?: number;
   client_type: string;
   first_name?: string;
   last_name?: string;
@@ -228,8 +343,10 @@ export interface CommunicationRecord {
   email_body?: string | null;
   sender: string;
   receiver: string;
-  linked_client_id?: number | null;
+  linked_client_id: number;
   linked_task_id?: number | null;
+  client?: { id: number; first_name?: string | null; last_name?: string | null; client_type?: string } | null;
+  task?: { id: number; title?: string | null } | null;
 }
 
 export interface AuditLogRecord {
@@ -392,6 +509,36 @@ export class RmcpApiService {
     return this.companiesCache$;
   }
 
+  getCompaniesPage(
+    page = 1,
+    perPage = 15,
+    q?: string,
+    sortBy: 'company_name' | 'industry' | 'email' | 'created_at' = 'company_name',
+    sortDir: 'asc' | 'desc' = 'asc'
+  ): Observable<CompaniesPage> {
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('per_page', String(perPage))
+      .set('sort_by', sortBy)
+      .set('sort_dir', sortDir);
+
+    if (q && q.trim().length > 0) {
+      params = params.set('q', q.trim());
+    }
+
+    return this.http.get<CompaniesPage>(`${this.apiBase}/companies`, { params }).pipe(
+      map((response) => ({
+        data: response.data ?? [],
+        current_page: response.current_page ?? page,
+        per_page: response.per_page ?? perPage,
+        last_page: response.last_page ?? 1,
+        total: response.total ?? 0,
+        next_page_url: response.next_page_url ?? null,
+        prev_page_url: response.prev_page_url ?? null,
+      }))
+    );
+  }
+
   invalidateCompaniesCache(): void {
     this.companiesCache$ = undefined;
   }
@@ -524,8 +671,38 @@ export class RmcpApiService {
     return this.http.delete<void>(`${this.apiBase}/documents/${documentId}`);
   }
 
-  getCases(): Observable<RmcpCaseRecord[]> {
-    return this.http.get<PaginatedResponse<RmcpCaseRecord>>(`${this.apiBase}/cases`).pipe(map((r) => r.data ?? []));
+  getCases(filters?: CaseFilters): Observable<CasesPage> {
+    let params = new HttpParams();
+
+    if (filters?.status) {
+      params = params.set('status', filters.status);
+    }
+
+    if (filters?.stage) {
+      params = params.set('stage', filters.stage);
+    }
+
+    if (filters?.client_id && filters.client_id > 0) {
+      params = params.set('client_id', String(filters.client_id));
+    }
+
+    if (filters?.per_page) {
+      params = params.set('per_page', String(filters.per_page));
+    }
+
+    if (filters?.page) {
+      params = params.set('page', String(filters.page));
+    }
+
+    return this.http.get<PaginatedCases>(`${this.apiBase}/cases`, { params }).pipe(
+      map((response) => ({
+        data: response.data ?? [],
+        current_page: response.current_page,
+        last_page: response.last_page,
+        per_page: response.per_page,
+        total: response.total,
+      }))
+    );
   }
 
   createCase(payload: { client_id: number; title: string; description?: string; checker_id?: number; sla_due_at?: string }): Observable<RmcpCaseRecord> {
@@ -595,8 +772,46 @@ export class RmcpApiService {
     return this.http.delete<void>(`${this.apiBase}/beneficial-owners/${id}`);
   }
 
-  getTasks(): Observable<TaskRecord[]> {
-    return this.http.get<PaginatedResponse<TaskRecord>>(`${this.apiBase}/tasks`).pipe(map((r) => r.data ?? []));
+  getTasks(filters?: TaskFilters): Observable<TasksPage> {
+    let params = new HttpParams();
+
+    if (filters?.status) {
+      params = params.set('status', filters.status);
+    }
+
+    if (filters?.assigned_to) {
+      params = params.set('assigned_to', String(filters.assigned_to));
+    }
+
+    if (filters?.q) {
+      params = params.set('q', filters.q);
+    }
+
+    if (filters?.sort_by) {
+      params = params.set('sort_by', filters.sort_by);
+    }
+
+    if (filters?.sort_dir) {
+      params = params.set('sort_dir', filters.sort_dir);
+    }
+
+    if (filters?.per_page) {
+      params = params.set('per_page', String(filters.per_page));
+    }
+
+    if (filters?.page) {
+      params = params.set('page', String(filters.page));
+    }
+
+    return this.http.get<PaginatedTasks>(`${this.apiBase}/tasks`, { params }).pipe(
+      map((response) => ({
+        data: response.data ?? [],
+        current_page: response.current_page,
+        last_page: response.last_page,
+        per_page: response.per_page,
+        total: response.total,
+      }))
+    );
   }
 
   createTask(payload: Partial<TaskRecord> & { title: string }): Observable<TaskRecord> {
@@ -611,16 +826,104 @@ export class RmcpApiService {
     return this.http.delete<void>(`${this.apiBase}/tasks/${id}`);
   }
 
-  getCommunications(): Observable<CommunicationRecord[]> {
-    return this.http.get<PaginatedResponse<CommunicationRecord>>(`${this.apiBase}/communications`).pipe(map((r) => r.data ?? []));
+  getCommunications(filters?: CommunicationFilters): Observable<CommunicationsPage> {
+    let params = new HttpParams();
+
+    if (filters?.linked_client_id) {
+      params = params.set('linked_client_id', String(filters.linked_client_id));
+    }
+
+    if (filters?.linked_task_id) {
+      params = params.set('linked_task_id', String(filters.linked_task_id));
+    }
+
+    if (filters?.q) {
+      params = params.set('q', filters.q);
+    }
+
+    if (filters?.sort_by) {
+      params = params.set('sort_by', filters.sort_by);
+    }
+
+    if (filters?.sort_dir) {
+      params = params.set('sort_dir', filters.sort_dir);
+    }
+
+    if (filters?.per_page) {
+      params = params.set('per_page', String(filters.per_page));
+    }
+
+    if (filters?.page) {
+      params = params.set('page', String(filters.page));
+    }
+
+    return this.http.get<PaginatedCommunications>(`${this.apiBase}/communications`, { params }).pipe(
+      map((response) => ({
+        data: response.data ?? [],
+        current_page: response.current_page,
+        last_page: response.last_page,
+        per_page: response.per_page,
+        total: response.total,
+      }))
+    );
   }
 
-  createCommunication(payload: Partial<CommunicationRecord> & { sender: string; receiver: string }): Observable<CommunicationRecord> {
+  createCommunication(payload: { sender: string; receiver: string; linked_client_id: number; email_subject?: string; email_body?: string; linked_task_id?: number }): Observable<CommunicationRecord> {
     return this.http.post<CommunicationRecord>(`${this.apiBase}/communications`, payload);
   }
 
-  getAuditLogs(): Observable<AuditLogRecord[]> {
-    return this.http.get<PaginatedResponse<AuditLogRecord>>(`${this.apiBase}/audit-logs`).pipe(map((r) => r.data ?? []));
+  getAuditLogs(filters?: AuditLogFilters): Observable<AuditLogsPage> {
+    let params = new HttpParams();
+
+    if (filters?.module) {
+      params = params.set('module', filters.module);
+    }
+
+    if (filters?.action) {
+      params = params.set('action', filters.action);
+    }
+
+    if (filters?.user_id) {
+      params = params.set('user_id', String(filters.user_id));
+    }
+
+    if (filters?.q) {
+      params = params.set('q', filters.q);
+    }
+
+    if (filters?.created_from) {
+      params = params.set('created_from', filters.created_from);
+    }
+
+    if (filters?.created_to) {
+      params = params.set('created_to', filters.created_to);
+    }
+
+    if (filters?.sort_by) {
+      params = params.set('sort_by', filters.sort_by);
+    }
+
+    if (filters?.sort_dir) {
+      params = params.set('sort_dir', filters.sort_dir);
+    }
+
+    if (filters?.per_page) {
+      params = params.set('per_page', String(filters.per_page));
+    }
+
+    if (filters?.page) {
+      params = params.set('page', String(filters.page));
+    }
+
+    return this.http.get<PaginatedAuditLogs>(`${this.apiBase}/audit-logs`, { params }).pipe(
+      map((response) => ({
+        data: response.data ?? [],
+        current_page: response.current_page,
+        last_page: response.last_page,
+        per_page: response.per_page,
+        total: response.total,
+      }))
+    );
   }
 
   getRolesPermissions(): Observable<{ permissions_catalog: string[]; roles: RoleRecord[] }> {

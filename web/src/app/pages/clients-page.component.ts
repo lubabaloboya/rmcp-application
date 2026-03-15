@@ -54,7 +54,7 @@ export class ClientsPageComponent implements OnInit {
   readonly highCount = computed(() => this.clients().filter((item) => item.risk_level === 'high').length);
 
   readonly form = this.fb.nonNullable.group({
-    company_id: [0, [Validators.required, Validators.min(1)]],
+    company_id: [0],
     client_type: ['individual', [Validators.required]],
     first_name: [''],
     last_name: [''],
@@ -164,12 +164,6 @@ export class ClientsPageComponent implements OnInit {
       return;
     }
 
-    if (this.companies().length === 0) {
-      this.toast.error('No companies available for bulk import.');
-      input.value = '';
-      return;
-    }
-
     this.bulkUploading.set(true);
 
     const reader = new FileReader();
@@ -193,7 +187,7 @@ export class ClientsPageComponent implements OnInit {
         }
 
         this.api.bulkCreateClients({
-          default_company_id: this.form.controls.company_id.value,
+          default_company_id: this.form.controls.company_id.value > 0 ? this.form.controls.company_id.value : undefined,
           rows,
         }).subscribe({
           next: (response) => {
@@ -233,16 +227,11 @@ export class ClientsPageComponent implements OnInit {
       return;
     }
 
-    if (this.companies().length === 0) {
-      this.errorMessage.set('No companies available. Please create or seed a company first.');
-      this.toast.error('No companies available for client creation.');
-      return;
-    }
-
     this.loading.set(true);
     this.errorMessage.set('');
 
     const payload = this.form.getRawValue() as CreateClientPayload;
+    payload.company_id = payload.company_id && payload.company_id > 0 ? payload.company_id : undefined;
     payload.client_type = payload.client_type === 'corporate' ? 'company' : payload.client_type;
 
     this.api.createClient(payload).subscribe({
@@ -361,10 +350,6 @@ export class ClientsPageComponent implements OnInit {
     this.api.getCompanies().subscribe({
       next: (response) => {
         this.companies.set(response ?? []);
-
-        if ((response?.length ?? 0) > 0 && this.form.controls.company_id.value <= 0) {
-          this.form.patchValue({ company_id: response[0].id });
-        }
       },
       error: (error) => {
         if (error?.status === 403) {

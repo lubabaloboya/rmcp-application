@@ -1,9 +1,38 @@
+<section class="panel hero">
+  <div>
+    <h2>Company Register</h2>
+    <p>Manage onboarding entities with complete profile details for compliance operations.</p>
+  </div>
+  <div class="hero-tip">
+    <strong>Tip:</strong>
+    Registration and tax numbers help improve downstream case and governance quality.
+  </div>
+</section>
+
+<section class="panel summary-grid">
+  <article>
+    <h3>Total Companies</h3>
+    <p class="metric">{{ totalCount() }}</p>
+  </article>
+  <article>
+    <h3>With Email</h3>
+    <p class="metric">{{ withEmailCount() }}</p>
+  </article>
+  <article>
+    <h3>With Industry</h3>
+    <p class="metric">{{ withIndustryCount() }}</p>
+  </article>
+</section>
+
 <section class="panel">
   <h3>{{ editingId() ? 'Edit Company' : 'Create Company' }}</h3>
   <form [formGroup]="form" (ngSubmit)="saveCompany()" class="form-grid">
     <label>
       Company Name
-      <input type="text" formControlName="company_name" />
+      <input type="text" formControlName="company_name" [class.invalid]="isFieldInvalid('company_name')" />
+      @if (isFieldInvalid('company_name')) {
+        <span class="field-error">{{ fieldError('company_name') }}</span>
+      }
     </label>
 
     <label>
@@ -28,7 +57,10 @@
 
     <label>
       Email
-      <input type="email" formControlName="email" />
+      <input type="email" formControlName="email" [class.invalid]="isFieldInvalid('email')" />
+      @if (isFieldInvalid('email')) {
+        <span class="field-error">{{ fieldError('email') }}</span>
+      }
     </label>
 
     <label class="full-width">
@@ -48,6 +80,29 @@
 <section class="panel">
   <h3>Companies</h3>
 
+  <div class="toolbar">
+    <input type="text" [value]="searchTerm()" (input)="setSearch($any($event.target).value)" placeholder="Search by name, registration, tax, industry, or email" />
+    <select [value]="sortBy()" (change)="setSortBy($any($event.target).value)">
+      <option value="company_name">Sort: Name</option>
+      <option value="industry">Sort: Industry</option>
+      <option value="email">Sort: Email</option>
+      <option value="created_at">Sort: Created Date</option>
+    </select>
+    <select [value]="sortDir()" (change)="setSortDir($any($event.target).value)">
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
+    <select [value]="perPage()" (change)="setPerPage(+$any($event.target).value)">
+      <option [value]="10">10 / page</option>
+      <option [value]="15">15 / page</option>
+      <option [value]="25">25 / page</option>
+      <option [value]="50">50 / page</option>
+    </select>
+    <button type="button" class="ghost" (click)="applySort()">Apply Sort</button>
+    <button type="button" (click)="applySearch()">Apply</button>
+    <button type="button" class="ghost" (click)="clearSearch()">Clear</button>
+  </div>
+
   @if (loading()) {
     <p>Loading companies...</p>
   }
@@ -57,6 +112,11 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>Registration</th>
+          <th>Tax</th>
+          <th>Industry</th>
+          <th>Email</th>
+          <th>Phone</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -64,6 +124,11 @@
         @for (company of companies(); track company.id) {
           <tr>
             <td>{{ company.company_name }}</td>
+            <td>{{ company.registration_number || '-' }}</td>
+            <td>{{ company.tax_number || '-' }}</td>
+            <td>{{ company.industry || '-' }}</td>
+            <td>{{ company.email || '-' }}</td>
+            <td>{{ company.phone || '-' }}</td>
             <td class="row-actions">
               <button type="button" class="ghost" (click)="startEdit(company)">Edit</button>
               <button type="button" [disabled]="deletingId() === company.id" (click)="deleteCompany(company.id)">
@@ -73,10 +138,18 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="2">No companies yet.</td>
+            <td colspan="7">No companies found for this page/filter.</td>
           </tr>
         }
       </tbody>
     </table>
+  </div>
+
+  <div class="pager" role="navigation" aria-label="Companies pagination">
+    <p>Showing page {{ currentPage() }} of {{ lastPage() }} ({{ total() }} total)</p>
+    <div class="pager-actions">
+      <button type="button" class="ghost" [disabled]="currentPage() <= 1" (click)="goToPreviousPage()">Previous</button>
+      <button type="button" [disabled]="currentPage() >= lastPage()" (click)="goToNextPage()">Next</button>
+    </div>
   </div>
 </section>

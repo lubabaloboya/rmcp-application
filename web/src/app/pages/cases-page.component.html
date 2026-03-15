@@ -17,33 +17,106 @@
   </form>
 </section>
 
+<section class="panel workflow-panel">
+  <h3>Workflow Rules</h3>
+  <ul class="workflow-rules">
+    @for (rule of workflowRules; track rule) {
+      <li>{{ rule }}</li>
+    }
+  </ul>
+</section>
+
+<section class="panel">
+  <h3>Filter Case Queue</h3>
+  <div class="filter-grid">
+    <label>
+      Status
+      <select [value]="selectedStatus()" (change)="setStatusFilter($any($event.target).value)">
+        <option value="">All</option>
+        <option value="draft">Draft</option>
+        <option value="pending_review">Pending Review</option>
+        <option value="edd_in_progress">EDD In Progress</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+        <option value="closed">Closed</option>
+      </select>
+    </label>
+
+    <label>
+      Stage
+      <select [value]="selectedStage()" (change)="setStageFilter($any($event.target).value)">
+        <option value="">All</option>
+        <option value="onboarding_review">Onboarding Review</option>
+        <option value="enhanced_due_diligence">Enhanced Due Diligence</option>
+        <option value="compliance_committee">Compliance Committee</option>
+        <option value="ongoing_monitoring">Ongoing Monitoring</option>
+        <option value="rejected">Rejected</option>
+        <option value="closure">Closure</option>
+      </select>
+    </label>
+
+    <label>
+      Client
+      <select [value]="selectedClientFilter()" (change)="setClientFilter($any($event.target).value)">
+        <option [value]="0">All clients</option>
+        @for (client of clients(); track client.id) {
+          <option [value]="client.id">{{ formatClientLabel(client) }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Per Page
+      <select [value]="perPage()" (change)="setPerPage(+$any($event.target).value)">
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+        <option [value]="50">50</option>
+      </select>
+    </label>
+
+    <div class="filter-actions">
+      <button type="button" (click)="applyFilters()">Apply</button>
+      <button type="button" class="ghost" (click)="resetFilters()">Reset</button>
+    </div>
+  </div>
+</section>
+
 <section class="panel">
   <h3>Case Queue</h3>
   @if (loading()) { <p>Loading...</p> }
   <div class="table-wrap">
     <table>
-      <thead><tr><th>#</th><th>Client</th><th>Title</th><th>Stage</th><th>Status</th><th>SLA</th><th>Actions</th></tr></thead>
+      <thead><tr><th>#</th><th>Client</th><th>Title</th><th>Stage</th><th>Status</th><th>Next Action</th><th>SLA</th><th>Actions</th></tr></thead>
       <tbody>
         @for (item of cases(); track item.id) {
           <tr>
             <td>{{ item.case_number }}</td>
             <td>{{ formatCaseClient(item) }}</td>
             <td>{{ item.title }}</td>
-            <td>{{ stageLabel(item.stage) }}</td>
-            <td>{{ item.status }}</td>
+            <td><span [class]="stageClass(item.stage)">{{ stageLabel(item.stage) }}</span></td>
+            <td><span [class]="statusClass(item.status)">{{ statusLabel(item.status) }}</span></td>
+            <td><span class="next-action">{{ nextActionHint(item) }}</span></td>
             <td>{{ item.sla_due_at || '-' }}</td>
             <td class="actions">
-              <button type="button" (click)="submitCase(item)">Submit</button>
-              <button type="button" (click)="startEdd(item)">Start EDD</button>
-              <button type="button" (click)="approveCase(item)">Approve</button>
-              <button type="button" (click)="rejectCase(item)">Reject</button>
-              <button type="button" (click)="closeCase(item)">Close</button>
+              <button type="button" [disabled]="!canSubmit(item)" (click)="submitCase(item)">Submit</button>
+              <button type="button" [disabled]="!canStartEdd(item)" (click)="startEdd(item)">Start EDD</button>
+              <button type="button" [disabled]="!canApprove(item)" (click)="approveCase(item)">Approve</button>
+              <button type="button" [disabled]="!canReject(item)" (click)="rejectCase(item)">Reject</button>
+              <button type="button" [disabled]="!canClose(item)" (click)="closeCase(item)">Close</button>
             </td>
           </tr>
         } @empty {
-          <tr><td colspan="7">No cases yet.</td></tr>
+          <tr><td colspan="8">No cases yet.</td></tr>
         }
       </tbody>
     </table>
+  </div>
+
+  <div class="pager" role="navigation" aria-label="Cases pagination">
+    <p>Showing page {{ currentPage() }} of {{ lastPage() }} ({{ total() }} total)</p>
+    <div class="pager-actions">
+      <button type="button" class="ghost" [disabled]="currentPage() <= 1" (click)="goToPreviousPage()">Previous</button>
+      <button type="button" [disabled]="currentPage() >= lastPage()" (click)="goToNextPage()">Next</button>
+    </div>
   </div>
 </section>

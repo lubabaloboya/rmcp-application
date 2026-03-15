@@ -10,6 +10,56 @@
   padding: 1rem;
 }
 
+.hero {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.9rem;
+  background: linear-gradient(130deg, #fffaf2 0%, #f3e8d2 100%);
+}
+
+.hero h2 {
+  margin: 0;
+  color: #17343f;
+}
+
+.hero p {
+  margin: 0.35rem 0 0;
+  color: #4f5f64;
+}
+
+.hero-tip {
+  align-self: center;
+  border: 1px dashed #b6aa95;
+  padding: 0.65rem;
+  color: #3d4a4f;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.7rem;
+}
+
+.summary-grid article {
+  border: 1px solid #d9ccb6;
+  background: #fff;
+  padding: 0.75rem;
+}
+
+.summary-grid h3 {
+  margin: 0;
+  color: #4f5f64;
+  font-size: 0.86rem;
+}
+
+.metric {
+  margin: 0.45rem 0 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1f2a30;
+}
+
 .form-grid {
   margin-top: 0.7rem;
   display: grid;
@@ -25,15 +75,27 @@ label {
 }
 
 input,
+select,
 button {
   font: inherit;
 }
 
-input {
+input,
+select {
   background: #fff;
   border: 1px solid #c9bca5;
   border-radius: 0;
   padding: 0.52rem 0.62rem;
+}
+
+input.invalid {
+  border-color: #a12f2f;
+  background: #fff4f4;
+}
+
+.field-error {
+  color: #a12f2f;
+  font-size: 0.75rem;
 }
 
 .full-width {
@@ -70,6 +132,32 @@ button:disabled {
   overflow-x: auto;
 }
 
+.toolbar {
+  margin: 0.65rem 0;
+  display: grid;
+  grid-template-columns: 1fr repeat(6, auto);
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.pager {
+  margin-top: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.pager p {
+  margin: 0;
+  color: #4f5f64;
+}
+
+.pager-actions {
+  display: flex;
+  gap: 0.55rem;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -96,7 +184,20 @@ th {
 }
 
 @media (max-width: 700px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .pager {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

@@ -1,32 +1,170 @@
+<section class="panel hero">
+  <div>
+    <h2>Task Board</h2>
+    <p>Create, track, and complete operational actions with clear status and due-date visibility.</p>
+  </div>
+  <div class="hero-tip">
+    <strong>Tip:</strong>
+    Keep titles short and specific, then add context in description.
+  </div>
+</section>
+
+<section class="panel summary-grid">
+  <article>
+    <h3>Total Tasks</h3>
+    <p class="metric">{{ tasks().length }}</p>
+  </article>
+  <article>
+    <h3>Pending</h3>
+    <p class="metric">{{ pendingCount() }}</p>
+  </article>
+  <article>
+    <h3>In Progress</h3>
+    <p class="metric">{{ inProgressCount() }}</p>
+  </article>
+  <article>
+    <h3>Done</h3>
+    <p class="metric">{{ doneCount() }}</p>
+  </article>
+  <article>
+    <h3>Overdue</h3>
+    <p class="metric">{{ overdueCount() }}</p>
+  </article>
+</section>
+
 <section class="panel">
-  <h3>Tasks</h3>
+  <h3>Create Task</h3>
   <form [formGroup]="form" (ngSubmit)="createTask()" class="grid">
-    <input type="text" formControlName="title" placeholder="Task title" />
-    <input type="text" formControlName="description" placeholder="Description" />
-    <select formControlName="status"><option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="done">Done</option></select>
-    <input type="date" formControlName="due_date" />
-    <button type="submit">Create</button>
+    <label class="full-width">
+      Title
+      <input type="text" formControlName="title" placeholder="e.g. Validate high-risk onboarding documents" [class.invalid]="isFieldInvalid('title')" />
+      @if (isFieldInvalid('title')) {
+        <span class="field-error">{{ fieldError('title') }}</span>
+      }
+    </label>
+
+    <label class="full-width">
+      Description (Optional)
+      <input type="text" formControlName="description" placeholder="Any context needed to complete this task" />
+    </label>
+
+    <label>
+      Initial Status
+      <select formControlName="status">
+        <option value="pending">Pending</option>
+        <option value="in_progress">In Progress</option>
+        <option value="done">Done</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </label>
+
+    <label>
+      Due Date
+      <input type="date" formControlName="due_date" />
+    </label>
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="submitting()">{{ submitting() ? 'Creating...' : 'Create Task' }}</button>
+    </div>
   </form>
+</section>
+
+<section class="panel filters">
+  <h3>Find Tasks</h3>
+  <div class="filter-grid">
+    <label>
+      Search
+      <input type="text" [value]="searchTerm()" (input)="setSearch($any($event.target).value)" placeholder="Search title or description" />
+    </label>
+
+    <label>
+      Status
+      <select [value]="statusFilter()" (change)="setStatusFilter($any($event.target).value)">
+        <option value="all">All</option>
+        <option value="pending">Pending</option>
+        <option value="in_progress">In Progress</option>
+        <option value="done">Done</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </label>
+
+    <label>
+      Sort By
+      <select [value]="sortBy()" (change)="setSortBy($any($event.target).value)">
+        <option value="created_at">Created Date</option>
+        <option value="due_date">Due Date</option>
+        <option value="status">Status</option>
+        <option value="title">Title</option>
+      </select>
+    </label>
+
+    <label>
+      Direction
+      <select [value]="sortDir()" (change)="setSortDir($any($event.target).value)">
+        <option value="desc">Descending</option>
+        <option value="asc">Ascending</option>
+      </select>
+    </label>
+
+    <label>
+      Per Page
+      <select [value]="perPage()" (change)="setPerPage(+$any($event.target).value)">
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+        <option [value]="50">50</option>
+      </select>
+    </label>
+
+    <div class="filter-actions">
+      <button type="button" (click)="applyFilters()">Apply</button>
+      <button type="button" class="ghost" (click)="clearFilters()">Clear</button>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h3>Task List</h3>
+
+  @if (loading()) {
+    <p>Loading tasks...</p>
+  }
 
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Title</th><th>Status</th><th>Due</th><th>Actions</th></tr></thead>
+      <thead>
+        <tr><th>Title</th><th>Status</th><th>Due</th><th>Actions</th></tr>
+      </thead>
       <tbody>
         @for (t of tasks(); track t.id) {
           <tr>
-            <td>{{ t.title }}</td>
-            <td>{{ t.status }}</td>
-            <td>{{ t.due_date || '-' }}</td>
             <td>
+              <strong>{{ t.title }}</strong>
+              <div class="task-description">{{ t.description || 'No description' }}</div>
+            </td>
+            <td><span [class]="statusClass(t.status)">{{ statusLabel(t.status) }}</span></td>
+            <td>
+              <span [class]="dueClass(t)">{{ dueBadge(t) }}</span>
+              <div class="due-date">{{ t.due_date || '-' }}</div>
+            </td>
+            <td class="actions">
+              <button type="button" class="ghost" (click)="setStatus(t, 'pending')">Pending</button>
               <button type="button" (click)="setStatus(t, 'in_progress')">Start</button>
               <button type="button" (click)="setStatus(t, 'done')">Done</button>
               <button type="button" class="danger" (click)="deleteTask(t)">Delete</button>
             </td>
           </tr>
         } @empty {
-          <tr><td colspan="4">No tasks.</td></tr>
+          <tr><td colspan="4">No tasks match the current filter.</td></tr>
         }
       </tbody>
     </table>
+  </div>
+</section>
+
+<section class="panel pager">
+  <p>Showing page {{ currentPage() }} of {{ lastPage() }} ({{ total() }} total)</p>
+  <div class="pager-actions">
+    <button type="button" class="ghost" [disabled]="currentPage() <= 1" (click)="goToPreviousPage()">Previous</button>
+    <button type="button" [disabled]="currentPage() >= lastPage()" (click)="goToNextPage()">Next</button>
   </div>
 </section>

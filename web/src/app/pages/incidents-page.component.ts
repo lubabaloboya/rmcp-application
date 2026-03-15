@@ -32,14 +32,17 @@ export class IncidentsPageComponent implements OnInit {
   readonly submitting = signal(false);
 
   readonly openCount = computed(() => this.incidents().filter((item) => item.status.toLowerCase() === 'open').length);
+  readonly pendingCount = computed(() => this.incidents().filter((item) => item.status.toLowerCase() === 'pending').length);
   readonly highSeverityCount = computed(() => this.incidents().filter((item) => item.severity.toLowerCase() === 'high').length);
 
   readonly form = this.fb.nonNullable.group({
-    incident_type: ['', [Validators.required]],
-    description: ['', [Validators.required]],
+    incident_type: ['', [Validators.required, Validators.minLength(3)]],
+    description: ['', [Validators.required, Validators.minLength(10)]],
     severity: ['medium' as const, [Validators.required]],
     status: ['open' as const, [Validators.required]],
   });
+
+  readonly descriptionLength = computed(() => this.form.controls.description.value.length);
 
   ngOnInit(): void {
     this.loadIncidents();
@@ -76,6 +79,7 @@ export class IncidentsPageComponent implements OnInit {
 
   createIncident(): void {
     if (this.form.invalid) {
+      this.form.markAllAsTouched();
       this.toast.error('Please complete all incident fields.');
       return;
     }
@@ -92,6 +96,8 @@ export class IncidentsPageComponent implements OnInit {
           severity: 'medium',
           status: 'open',
         });
+        this.form.markAsPristine();
+        this.form.markAsUntouched();
         this.currentPage.set(1);
         this.loadIncidents();
       },
@@ -100,6 +106,60 @@ export class IncidentsPageComponent implements OnInit {
         this.toast.error('Unable to create incident.');
       },
     });
+  }
+
+  isFieldInvalid(field: 'incident_type' | 'description'): boolean {
+    const control = this.form.controls[field];
+    return control.invalid && (control.touched || control.dirty);
+  }
+
+  fieldError(field: 'incident_type' | 'description'): string {
+    const control = this.form.controls[field];
+
+    if (control.hasError('required')) {
+      return field === 'incident_type' ? 'Incident type is required.' : 'Description is required.';
+    }
+
+    if (control.hasError('minlength')) {
+      return field === 'incident_type'
+        ? 'Incident type must be at least 3 characters.'
+        : 'Description must be at least 10 characters.';
+    }
+
+    return '';
+  }
+
+  formatSeverity(value: string): string {
+    const label = value.toLowerCase();
+    if (label === 'high') {
+      return 'High';
+    }
+    if (label === 'medium') {
+      return 'Medium';
+    }
+    return 'Low';
+  }
+
+  formatStatus(value: string): string {
+    const label = value.toLowerCase();
+    if (label === 'open') {
+      return 'Open';
+    }
+    if (label === 'pending') {
+      return 'Pending';
+    }
+    if (label === 'resolved') {
+      return 'Resolved';
+    }
+    return 'Closed';
+  }
+
+  severityClass(value: string): string {
+    return `pill severity-${value.toLowerCase()}`;
+  }
+
+  statusClass(value: string): string {
+    return `pill status-${value.toLowerCase()}`;
   }
 
   updateIncidentStatus(incidentId: number, status: string): void {

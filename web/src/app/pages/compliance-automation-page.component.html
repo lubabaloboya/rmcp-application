@@ -1,23 +1,36 @@
-<section class="panel">
-  <h3>Compliance Automation Control</h3>
-  <p>Manage risk rules, required document checklists, and run screening workflows from one place.</p>
+<!-- Summary Cards -->
+<section class="panel summary-cards">
+  <div class="summary-card">
+    <h4>Total Risk Rules</h4>
+    <p class="metric">{{ riskRules().length }}</p>
+  </div>
+  <div class="summary-card">
+    <h4>Clients</h4>
+    <p class="metric">{{ clients().length }}</p>
+  </div>
+  <div class="summary-card">
+    <h4>Checklist Types</h4>
+    <p class="metric">{{ documentTypes().length }}</p>
+  </div>
 </section>
 
+<!-- Main Panels -->
 <section class="grid-two">
   <article class="panel">
-    <h4>Risk Scoring Rules</h4>
+    <h4>Risk Scoring Rules <span title="Rules used to calculate client risk score.">🛈</span></h4>
     <div class="table-wrap">
+      <input type="text" placeholder="Search rules..." (input)="filterRules($any($event.target).value)" style="margin-bottom:0.5rem;width:100%" />
       <table>
         <thead>
           <tr>
             <th>Rule</th>
             <th>Enabled</th>
-            <th>Weight</th>
+            <th>Weight <span title="Higher weight = more impact on risk score.">🛈</span></th>
             <th>Description</th>
           </tr>
         </thead>
         <tbody>
-          @for (rule of riskRules(); track rule.id) {
+          @for (rule of filteredRules(); track rule.id) {
             <tr>
               <td>{{ rule.label }}</td>
               <td>
@@ -58,7 +71,7 @@
   </article>
 
   <article class="panel">
-    <h4>Mandatory Document Checklist</h4>
+    <h4>Mandatory Document Checklist <span title="Select required documents for compliance.">🛈</span></h4>
 
     <div class="switches">
       <button type="button" class="ghost" [class.active]="checklistClientType() === 'individual'" (click)="loadChecklist('individual')">Individual</button>
@@ -77,19 +90,21 @@
     </div>
 
     <button type="button" [disabled]="savingChecklist()" (click)="saveChecklist()">
-      {{ savingChecklist() ? 'Saving...' : 'Save Checklist' }}
+      <span *ngIf="savingChecklist()">💾 Saving...</span>
+      <span *ngIf="!savingChecklist()">💾 Save Checklist</span>
     </button>
   </article>
 </section>
 
 <section class="panel">
-  <h4>Screening Operations</h4>
+  <h4>Screening Operations <span title="Run compliance screening for a client.">🛈</span></h4>
 
   <div class="screening-controls">
     <label>
       Client
+      <input type="text" placeholder="Search clients..." (input)="filterClients($any($event.target).value)" style="margin-bottom:0.5rem;width:100%" />
       <select [value]="selectedClientId()" (change)="onClientChange($any($event.target).value)">
-        @for (client of clients(); track client.id) {
+        @for (client of filteredClients(); track client.id) {
           <option [value]="client.id">{{ (client.first_name || '') + ' ' + (client.last_name || '') }} (ID: {{ client.id }})</option>
         } @empty {
           <option [value]="0">No clients available</option>
@@ -98,7 +113,8 @@
     </label>
 
     <button type="button" [disabled]="screeningInProgress() || selectedClientId() <= 0" (click)="runManualScreening()">
-      {{ screeningInProgress() ? 'Running...' : 'Run Manual Screening' }}
+      <span *ngIf="screeningInProgress()">🔎 Running...</span>
+      <span *ngIf="!screeningInProgress()">🔎 Run Manual Screening</span>
     </button>
   </div>
 

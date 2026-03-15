@@ -10,10 +10,41 @@
   padding: 1rem;
 }
 
+.hero {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  background: linear-gradient(130deg, #fffaf2 0%, #f3e8d2 100%);
+}
+
+.hero h2 {
+  margin: 0;
+  color: #17343f;
+}
+
+.hero p {
+  margin: 0.35rem 0 0;
+  color: #4f5f64;
+}
+
+.hero-tip {
+  align-self: center;
+  border: 1px dashed #b6aa95;
+  padding: 0.7rem;
+  color: #3d4a4f;
+  background: rgba(255, 255, 255, 0.45);
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 0.8rem;
+}
+
+.summary-grid article {
+  border: 1px solid #d9ccb6;
+  background: #fff;
+  padding: 0.8rem;
 }
 
 .summary-grid h3 {
@@ -29,10 +60,17 @@
   gap: 0.7rem;
 }
 
+.panel-help {
+  margin: 0.4rem 0 0;
+  color: #4f5f64;
+  font-size: 0.86rem;
+}
+
 .metric {
   margin: 0.55rem 0 0;
   font-size: 1.8rem;
   font-weight: 700;
+  color: #1f2a30;
 }
 
 .filters h3 {
@@ -69,8 +107,39 @@ textarea {
   padding: 0.52rem 0.62rem;
 }
 
+input.invalid,
+textarea.invalid {
+  border-color: #a12f2f;
+  background: #fff4f4;
+}
+
+.field-error {
+  color: #a12f2f;
+  font-size: 0.75rem;
+}
+
+.description-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: #5f6668;
+  font-size: 0.75rem;
+}
+
 .full-width {
   grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.form-actions p {
+  margin: 0;
+  color: #4f5f64;
+  font-size: 0.82rem;
 }
 
 .filter-actions {
@@ -129,6 +198,73 @@ button:disabled {
   padding-left: 0.6rem;
 }
 
+.incident-card {
+  background: #fff;
+  border: 1px solid #dfd2bd;
+  padding: 0.65rem 0.7rem;
+}
+
+.incident-header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+
+.pill-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: inline-block;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.severity-high {
+  background: #f7d7d7;
+  color: #8f2727;
+}
+
+.severity-medium {
+  background: #f6eccd;
+  color: #8a5e1f;
+}
+
+.severity-low {
+  background: #dff0e4;
+  color: #176b35;
+}
+
+.status-open {
+  background: #e8eff8;
+  color: #24507a;
+}
+
+.status-pending {
+  background: #efe5cf;
+  color: #75541f;
+}
+
+.status-resolved {
+  background: #def0e0;
+  color: #1f6c34;
+}
+
+.status-closed {
+  background: #e9e5dd;
+  color: #5f6668;
+}
+
+.incident-description {
+  margin: 0.45rem 0;
+  color: #2f3b41;
+}
+
 .inline-actions {
   display: flex;
   gap: 0.5rem;
@@ -152,6 +288,10 @@ button:disabled {
 }
 
 @media (max-width: 920px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
   .create-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -165,6 +305,12 @@ button:disabled {
   .create-grid,
   .filter-grid {
     grid-template-columns: 1fr;
+  }
+
+  .incident-header-row,
+  .form-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .pager {

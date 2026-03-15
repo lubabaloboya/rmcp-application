@@ -1,6 +1,17 @@
+<section class="panel hero">
+  <div>
+    <h2>Incident Center</h2>
+    <p>Capture incidents quickly, then track status from open to closure.</p>
+  </div>
+  <div class="hero-tip">
+    <strong>Tip:</strong>
+    Use short, factual summaries. Keep description objective and action-focused.
+  </div>
+</section>
+
 <section class="panel summary-grid">
   <article>
-    <h3>Total Recent Incidents</h3>
+    <h3>Visible Incidents</h3>
     <p class="metric">{{ incidents().length }}</p>
   </article>
   <article>
@@ -8,17 +19,30 @@
     <p class="metric">{{ openCount() }}</p>
   </article>
   <article>
+    <h3>Pending Follow-Up</h3>
+    <p class="metric">{{ pendingCount() }}</p>
+  </article>
+  <article>
     <h3>High Severity</h3>
     <p class="metric">{{ highSeverityCount() }}</p>
   </article>
 </section>
 
-<section class="panel">
+<section class="panel report-panel">
   <h3>Report Incident</h3>
+  <p class="panel-help">Client linkage is not mandatory here. Focus on accurate classification and details.</p>
   <form [formGroup]="form" (ngSubmit)="createIncident()" class="create-grid">
     <label>
       Incident Type
-      <input type="text" formControlName="incident_type" placeholder="Sanctions Alert" />
+      <input
+        type="text"
+        formControlName="incident_type"
+        placeholder="e.g. Sanctions alert, suspicious transfer"
+        [class.invalid]="isFieldInvalid('incident_type')"
+      />
+      @if (isFieldInvalid('incident_type')) {
+        <span class="field-error">{{ fieldError('incident_type') }}</span>
+      }
     </label>
 
     <label>
@@ -42,10 +66,25 @@
 
     <label class="full-width">
       Description
-      <textarea rows="3" formControlName="description" placeholder="Incident details..."></textarea>
+      <textarea
+        rows="4"
+        formControlName="description"
+        placeholder="What happened, when, who was impacted, and immediate action taken..."
+        [class.invalid]="isFieldInvalid('description')"
+      ></textarea>
+      <div class="description-meta">
+        <span>Minimum 10 characters</span>
+        <span>{{ descriptionLength() }} chars</span>
+      </div>
+      @if (isFieldInvalid('description')) {
+        <span class="field-error">{{ fieldError('description') }}</span>
+      }
     </label>
 
-    <button type="submit" [disabled]="submitting()">{{ submitting() ? 'Saving...' : 'Create Incident' }}</button>
+    <div class="form-actions full-width">
+      <button type="submit" [disabled]="submitting()">{{ submitting() ? 'Saving...' : 'Create Incident' }}</button>
+      <p>Submitted incidents appear immediately in the feed below.</p>
+    </div>
   </form>
 </section>
 
@@ -119,13 +158,19 @@
 
 <section class="panel">
   <h3>Incident Feed</h3>
+  <p class="panel-help">Review severity, status, reporter, and update progress inline.</p>
   <ul class="incident-list">
-    @for (incident of incidents(); track $index) {
+    @for (incident of incidents(); track incident.id) {
       <li>
-        <div>
-          <strong>{{ incident.incident_type }}</strong>
-          <span>{{ incident.status }} | {{ incident.severity }}</span>
-          <span>{{ incident.description }}</span>
+        <div class="incident-card">
+          <div class="incident-header-row">
+            <strong>{{ incident.incident_type }}</strong>
+            <div class="pill-row">
+              <span [class]="severityClass(incident.severity)">{{ formatSeverity(incident.severity) }}</span>
+              <span [class]="statusClass(incident.status)">{{ formatStatus(incident.status) }}</span>
+            </div>
+          </div>
+          <p class="incident-description">{{ incident.description }}</p>
           <span>Reporter: {{ incident.reporter?.name || 'Unknown' }}</span>
           <div class="inline-actions">
             <select #statusSelect [value]="incident.status">

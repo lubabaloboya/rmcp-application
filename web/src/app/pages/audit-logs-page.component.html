@@ -1,21 +1,147 @@
+<section class="panel hero">
+  <div>
+    <h2>Audit Trail</h2>
+    <p>Track who did what, where, and when across core RMCP modules.</p>
+  </div>
+  <div class="hero-tip">
+    <strong>Control:</strong>
+    Use filters to narrow events before exporting or investigation.
+  </div>
+</section>
+
+<section class="panel summary-grid">
+  <article>
+    <h3>Total Events</h3>
+    <p class="metric">{{ totalVisible() }}</p>
+  </article>
+  <article>
+    <h3>Modules On Page</h3>
+    <p class="metric">{{ uniqueModules() }}</p>
+  </article>
+  <article>
+    <h3>System Events</h3>
+    <p class="metric">{{ systemEvents() }}</p>
+  </article>
+</section>
+
+<section class="panel filters">
+    <div class="saved-views-row">
+      <label>
+        Saved Views
+        <select (change)="applySavedView($any($event.target).value)">
+          <option value="">Select...</option>
+          @for (let i = 0; i < savedViews.length; i++) {
+            <option [value]="i">{{ savedViews[i].label }}</option>
+          }
+        </select>
+      </label>
+      <span class="hint">Quickly apply common filters</span>
+    </div>
+  <h3>Filter Audit Logs</h3>
+  <div class="filter-grid">
+    <label>
+      Search
+      <input type="text" [value]="query()" (input)="setQuery($any($event.target).value)" placeholder="Search module, action, record ID, user" />
+    </label>
+
+    <label>
+      Module
+      <select [value]="moduleFilter()" (change)="setModuleFilter($any($event.target).value)">
+        <option value="">All</option>
+        @for (module of moduleOptions; track module) {
+          <option [value]="module">{{ module }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Action
+      <select [value]="actionFilter()" (change)="setActionFilter($any($event.target).value)">
+        <option value="">All</option>
+        @for (action of actionOptions; track action) {
+          <option [value]="action">{{ action }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      From Date
+      <input type="date" [value]="createdFrom()" (change)="setCreatedFrom($any($event.target).value)" />
+    </label>
+
+    <label>
+      To Date
+      <input type="date" [value]="createdTo()" (change)="setCreatedTo($any($event.target).value)" />
+    </label>
+
+    <label>
+      Sort By
+      <select [value]="sortBy()" (change)="setSortBy($any($event.target).value)">
+        <option value="created_at">Created Date</option>
+        <option value="module">Module</option>
+        <option value="action">Action</option>
+        <option value="record_id">Record ID</option>
+      </select>
+    </label>
+
+    <label>
+      Direction
+      <select [value]="sortDir()" (change)="setSortDir($any($event.target).value)">
+        <option value="desc">Descending</option>
+        <option value="asc">Ascending</option>
+      </select>
+    </label>
+
+    <label>
+      Per Page
+      <select [value]="perPage()" (change)="setPerPage(+$any($event.target).value)">
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+        <option [value]="100">100</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="filter-actions">
+    <button type="button" (click)="applyFilters()">Apply</button>
+    <button type="button" class="ghost" (click)="resetFilters()">Reset</button>
+  </div>
+</section>
+
 <section class="panel">
-  <h3>Audit Logs</h3>
+  <h3>Events</h3>
+
+  @if (loading()) {
+    <p>Loading audit logs...</p>
+  }
+
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Time</th><th>User</th><th>Module</th><th>Action</th><th>Record ID</th></tr></thead>
+      <thead>
+        <tr><th>Time</th><th>User</th><th>Module</th><th>Action</th><th>Record ID</th></tr>
+      </thead>
       <tbody>
         @for (log of logs(); track log.id) {
           <tr>
             <td>{{ log.created_at | date:'medium' }}</td>
             <td>{{ log.user?.name || 'System' }}</td>
-            <td>{{ log.module }}</td>
-            <td>{{ log.action }}</td>
+            <td><span class="module-pill">{{ log.module }}</span></td>
+            <td><span [class]="actionClass(log.action)">{{ log.action }}</span></td>
             <td>{{ log.record_id || '-' }}</td>
           </tr>
         } @empty {
-          <tr><td colspan="5">No audit logs.</td></tr>
+          <tr><td colspan="5">No audit logs found for current filters.</td></tr>
         }
       </tbody>
     </table>
+  </div>
+
+  <div class="pager" role="navigation" aria-label="Audit logs pagination">
+    <p>Showing page {{ currentPage() }} of {{ lastPage() }} ({{ totalVisible() }} total)</p>
+    <div class="pager-actions">
+      <button type="button" class="ghost" [disabled]="currentPage() <= 1" (click)="goToPreviousPage()">Previous</button>
+      <button type="button" [disabled]="currentPage() >= lastPage()" (click)="goToNextPage()">Next</button>
+    </div>
   </div>
 </section>

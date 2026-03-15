@@ -3,10 +3,11 @@
     <h3>Add Wealth Client</h3>
     <form [formGroup]="form" (ngSubmit)="createClient()" class="form-grid compact">
       <label>
-        Company
+        Company (Optional)
         <select formControlName="company_id">
+          <option [value]="0">No linked company</option>
           @if (companies().length === 0) {
-            <option [value]="0">No companies available</option>
+            <option [value]="0" disabled>No companies available</option>
           } @else {
             @for (company of companies(); track company.id) {
               <option [value]="company.id">{{ company.company_name }} (ID: {{ company.id }})</option>
@@ -82,7 +83,7 @@
           <option value="rejected">Rejected</option>
         </select>
       </label>
-      <button type="submit" [disabled]="loading() || companies().length === 0">{{ loading() ? 'Saving...' : 'Create Client' }}</button>
+      <button type="submit" [disabled]="loading()">{{ loading() ? 'Saving...' : 'Create Client' }}</button>
     </form>
   </article>
 
@@ -98,10 +99,10 @@
 
 <section class="panel">
   <h3>Bulk Upload Clients (Excel)</h3>
-  <p>Upload .xlsx/.xls file with columns: company_id, client_type, first_name, last_name, email, phone, address, id_number, passport_number, source_of_wealth, source_of_funds, annual_income_band, net_worth_band, investment_objective, wealth_profile_status.</p>
+  <p>Upload .xlsx/.xls file with columns: company_id (optional), client_type, first_name, last_name, email, phone, address, id_number, passport_number, source_of_wealth, source_of_funds, annual_income_band, net_worth_band, investment_objective, wealth_profile_status.</p>
   <div class="bulk-actions">
     <button type="button" class="ghost" (click)="downloadBulkTemplate()">Download Template</button>
-    <input type="file" accept=".xlsx,.xls,.csv" (change)="onBulkFileSelected($event)" [disabled]="bulkUploading() || companies().length === 0" />
+    <input type="file" accept=".xlsx,.xls,.csv" (change)="onBulkFileSelected($event)" [disabled]="bulkUploading()" />
   </div>
   @if (bulkUploading()) {
     <p>Uploading and validating rows...</p>

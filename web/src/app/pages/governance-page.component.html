@@ -1,30 +1,174 @@
-<section class="panel"><h3>Directors</h3>
+<section class="panel company-panel">
+  <h3>Governance Register</h3>
+  <p>Select a company, then manage directors, shareholders, and beneficial owners in one place.</p>
+  <label class="company-selector">
+    Active Company
+    <select [value]="selectedCompanyId()" (change)="onCompanyChange($any($event.target).value)">
+      @if (companies().length === 0) {
+        <option [value]="0">No companies available</option>
+      } @else {
+        @for (company of companies(); track company.id) {
+          <option [value]="company.id">{{ company.company_name }} (ID: {{ company.id }})</option>
+        }
+      }
+    </select>
+  </label>
+  <div class="active-company-badge">Current: {{ selectedCompanyName() }}</div>
+</section>
+
+<section class="panel"><h3>Directors / Control Persons</h3>
   <form [formGroup]="directorForm" (ngSubmit)="addDirector()" class="grid">
-    <input type="number" formControlName="company_id" placeholder="Company ID" />
-    <input type="text" formControlName="first_name" placeholder="First name" />
-    <input type="text" formControlName="last_name" placeholder="Last name" />
-    <input type="text" formControlName="position" placeholder="Position" />
-    <button type="submit">Add Director</button>
+    <label>
+      First Name
+      <input type="text" formControlName="first_name" placeholder="e.g. Jane" />
+      @if (directorForm.controls.first_name.touched && directorForm.controls.first_name.invalid) {
+        <span class="field-error">First name is required.</span>
+      }
+    </label>
+    <label>
+      Last Name
+      <input type="text" formControlName="last_name" placeholder="e.g. Smith" />
+      @if (directorForm.controls.last_name.touched && directorForm.controls.last_name.invalid) {
+        <span class="field-error">Last name is required.</span>
+      }
+    </label>
+    <label>
+      ID Number (Optional)
+      <input type="text" formControlName="id_number" placeholder="National ID / Passport" />
+    </label>
+    <label>
+      Position
+      <input type="text" formControlName="position" placeholder="e.g. Director, CFO" />
+    </label>
+    <button type="submit" [disabled]="selectedCompanyId() <= 0">Add Director</button>
   </form>
-  <ul>@for (d of directors(); track d.id) { <li>{{ d.first_name }} {{ d.last_name }} <button type="button" (click)="deleteDirector(d)">Delete</button></li> }</ul>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Position</th><th>ID/Passport</th><th>Company</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        @for (d of directors(); track d.id) {
+          <tr>
+            <td>{{ d.first_name }} {{ d.last_name }}</td>
+            <td>{{ d.position || '-' }}</td>
+            <td>{{ d.id_number || '-' }}</td>
+            <td><a class="company-tag" [routerLink]="['/companies']" [queryParams]="{ company_id: selectedCompanyId() }">{{ selectedCompanyName() }}</a></td>
+            <td><button type="button" (click)="deleteDirector(d)">Delete</button></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5">No directors for selected company.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <section class="panel"><h3>Shareholders</h3>
+  <div class="ownership-summary">
+    <div><span>Total Allocated</span><strong>{{ shareholderTotal() | number:'1.0-2' }}%</strong></div>
+    <div><span>Remaining</span><strong>{{ shareholderRemaining() | number:'1.0-2' }}%</strong></div>
+    <div><span>Status</span><strong>{{ ownershipStatusLabel(shareholderRemaining()) }}</strong></div>
+  </div>
+  <div class="progress-track" aria-hidden="true"><span class="progress-fill" [style.width.%]="ownershipUsedPercent(shareholderTotal())"></span></div>
+
   <form [formGroup]="shareholderForm" (ngSubmit)="addShareholder()" class="grid">
-    <input type="number" formControlName="company_id" placeholder="Company ID" />
-    <input type="text" formControlName="shareholder_name" placeholder="Name" />
-    <input type="number" formControlName="ownership_percentage" placeholder="Ownership %" />
-    <button type="submit">Add Shareholder</button>
+    <label>
+      Shareholder Name
+      <input type="text" formControlName="shareholder_name" placeholder="Individual or entity name" />
+      @if (shareholderForm.controls.shareholder_name.touched && shareholderForm.controls.shareholder_name.invalid) {
+        <span class="field-error">Shareholder name is required.</span>
+      }
+    </label>
+    <label>
+      Ownership Percentage
+      <input type="number" formControlName="ownership_percentage" min="0" max="100" step="0.01" placeholder="e.g. 25 means 25%" />
+      @if (shareholderForm.controls.ownership_percentage.touched && shareholderForm.controls.ownership_percentage.hasError('required')) {
+        <span class="field-error">Ownership percentage is required.</span>
+      }
+      @if (shareholderForm.controls.ownership_percentage.touched && (shareholderForm.controls.ownership_percentage.hasError('min') || shareholderForm.controls.ownership_percentage.hasError('max'))) {
+        <span class="field-error">Ownership percentage must be between 0 and 100.</span>
+      }
+      @if (shareholderForm.controls.ownership_percentage.touched && shareholderForm.controls.ownership_percentage.value > shareholderRemaining()) {
+        <span class="field-error">Entered percentage exceeds remaining {{ shareholderRemaining() | number:'1.0-2' }}%.</span>
+      }
+    </label>
+    <button type="submit" [disabled]="selectedCompanyId() <= 0 || shareholderRemaining() <= 0">Add Shareholder</button>
   </form>
-  <ul>@for (s of shareholders(); track s.id) { <li>{{ s.shareholder_name }} ({{ s.ownership_percentage }}%) <button type="button" (click)="deleteShareholder(s)">Delete</button></li> }</ul>
+  <p class="input-help">Ownership Percentage: enter a value between 0 and 100. Example: 12.5 means a 12.5% shareholding. Remaining for this company: {{ shareholderRemaining() }}%</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Ownership %</th><th>Company</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        @for (s of shareholders(); track s.id) {
+          <tr>
+            <td>{{ s.shareholder_name }}</td>
+            <td>{{ s.ownership_percentage | number:'1.0-2' }}%</td>
+            <td><a class="company-tag" [routerLink]="['/companies']" [queryParams]="{ company_id: selectedCompanyId() }">{{ selectedCompanyName() }}</a></td>
+            <td><button type="button" (click)="deleteShareholder(s)">Delete</button></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4">No shareholders for selected company.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <section class="panel"><h3>Beneficial Owners</h3>
+  <div class="ownership-summary">
+    <div><span>Total Allocated</span><strong>{{ ownerTotal() | number:'1.0-2' }}%</strong></div>
+    <div><span>Remaining</span><strong>{{ ownerRemaining() | number:'1.0-2' }}%</strong></div>
+    <div><span>Status</span><strong>{{ ownershipStatusLabel(ownerRemaining()) }}</strong></div>
+  </div>
+  <div class="progress-track" aria-hidden="true"><span class="progress-fill owner" [style.width.%]="ownershipUsedPercent(ownerTotal())"></span></div>
+
   <form [formGroup]="ownerForm" (ngSubmit)="addOwner()" class="grid">
-    <input type="number" formControlName="company_id" placeholder="Company ID" />
-    <input type="text" formControlName="name" placeholder="Name" />
-    <input type="number" formControlName="ownership_percentage" placeholder="Ownership %" />
-    <button type="submit">Add Owner</button>
+    <label>
+      Beneficial Owner Name
+      <input type="text" formControlName="name" placeholder="Natural person name" />
+      @if (ownerForm.controls.name.touched && ownerForm.controls.name.invalid) {
+        <span class="field-error">Beneficial owner name is required.</span>
+      }
+    </label>
+    <label>
+      Ownership Percentage
+      <input type="number" formControlName="ownership_percentage" min="0" max="100" step="0.01" placeholder="e.g. 33.33 means 33.33%" />
+      @if (ownerForm.controls.ownership_percentage.touched && ownerForm.controls.ownership_percentage.hasError('required')) {
+        <span class="field-error">Ownership percentage is required.</span>
+      }
+      @if (ownerForm.controls.ownership_percentage.touched && (ownerForm.controls.ownership_percentage.hasError('min') || ownerForm.controls.ownership_percentage.hasError('max'))) {
+        <span class="field-error">Ownership percentage must be between 0 and 100.</span>
+      }
+      @if (ownerForm.controls.ownership_percentage.touched && ownerForm.controls.ownership_percentage.value > ownerRemaining()) {
+        <span class="field-error">Entered percentage exceeds remaining {{ ownerRemaining() | number:'1.0-2' }}%.</span>
+      }
+    </label>
+    <button type="submit" [disabled]="selectedCompanyId() <= 0 || ownerRemaining() <= 0">Add Owner</button>
   </form>
-  <ul>@for (o of owners(); track o.id) { <li>{{ o.name }} ({{ o.ownership_percentage }}%) <button type="button" (click)="deleteOwner(o)">Delete</button></li> }</ul>
+  <p class="input-help">Beneficial Ownership Percentage: enter a value between 0 and 100. Example: 51 means controlling ownership. Remaining for this company: {{ ownerRemaining() }}%</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Ownership %</th><th>Company</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        @for (o of owners(); track o.id) {
+          <tr>
+            <td>{{ o.name }}</td>
+            <td>{{ o.ownership_percentage | number:'1.0-2' }}%</td>
+            <td><a class="company-tag" [routerLink]="['/companies']" [queryParams]="{ company_id: selectedCompanyId() }">{{ selectedCompanyName() }}</a></td>
+            <td><button type="button" (click)="deleteOwner(o)">Delete</button></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4">No beneficial owners for selected company.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </section>

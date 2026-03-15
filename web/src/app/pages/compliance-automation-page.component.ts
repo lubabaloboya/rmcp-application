@@ -20,6 +20,35 @@ import { ToastService } from '../core/toast.service';
   styleUrl: './compliance-automation-page.component.scss'
 })
 export class ComplianceAutomationPageComponent implements OnInit {
+    // For user-friendly filtering
+    readonly ruleFilter = signal('');
+    readonly clientFilter = signal('');
+
+    filteredRules = computed(() => {
+      const filter = this.ruleFilter().toLowerCase();
+      if (!filter) return this.riskRules();
+      return this.riskRules().filter(rule =>
+        rule.label.toLowerCase().includes(filter) ||
+        (rule.description || '').toLowerCase().includes(filter)
+      );
+    });
+
+    filteredClients = computed(() => {
+      const filter = this.clientFilter().toLowerCase();
+      if (!filter) return this.clients();
+      return this.clients().filter(client =>
+        ((client.first_name || '') + ' ' + (client.last_name || '')).toLowerCase().includes(filter) ||
+        String(client.id).includes(filter)
+      );
+    });
+
+    filterRules(value: string): void {
+      this.ruleFilter.set(value);
+    }
+
+    filterClients(value: string): void {
+      this.clientFilter.set(value);
+    }
   private readonly api = inject(RmcpApiService);
   private readonly toast = inject(ToastService);
 
