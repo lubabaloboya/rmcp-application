@@ -30,9 +30,7 @@
         Saved Views
         <select (change)="applySavedView($any($event.target).value)">
           <option value="">Select...</option>
-          @for (let i = 0; i < savedViews.length; i++) {
-            <option [value]="i">{{ savedViews[i].label }}</option>
-          }
+          <option *ngFor="let view of savedViews; let i = index" [value]="i">{{ view.label }}</option>
         </select>
       </label>
       <span class="hint">Quickly apply common filters</span>
@@ -48,9 +46,7 @@
       Module
       <select [value]="moduleFilter()" (change)="setModuleFilter($any($event.target).value)">
         <option value="">All</option>
-        @for (module of moduleOptions; track module) {
-          <option [value]="module">{{ module }}</option>
-        }
+        <option *ngFor="let module of moduleOptions" [value]="module">{{ module }}</option>
       </select>
     </label>
 
@@ -58,9 +54,7 @@
       Action
       <select [value]="actionFilter()" (change)="setActionFilter($any($event.target).value)">
         <option value="">All</option>
-        @for (action of actionOptions; track action) {
-          <option [value]="action">{{ action }}</option>
-        }
+        <option *ngFor="let action of actionOptions" [value]="action">{{ action }}</option>
       </select>
     </label>
 
