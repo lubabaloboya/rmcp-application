@@ -17,6 +17,8 @@ yarn-error.log*
 
 # Docker and runtime artifacts
 *.pid
+# Ignore docker-compose.yml
+/docker-compose.yml
 
 # PHP / Laravel
 api/vendor/
@@ -32,6 +34,9 @@ api/bootstrap/cache/*.php
 web/node_modules/
 web/dist/
 web/.angular/
+
+# Ignore Laravel environment file
+/api/.env
 
 # Misc
 *.tmp
