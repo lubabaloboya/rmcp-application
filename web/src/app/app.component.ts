@@ -14,6 +14,11 @@ import { ToastContainerComponent } from './shared/toast-container.component';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
+    sidebarOpen = false;
+
+    isMobile(): boolean {
+      return window.innerWidth <= 760;
+    }
   private readonly auth = inject(AuthService);
   private readonly loading = inject(LoadingService);
   private readonly router = inject(Router);

@@ -1,21 +1,45 @@
-<section class="panel">
-  <h3>Wealth Client Lifecycle Cases</h3>
-  <form [formGroup]="form" (ngSubmit)="createCase()" class="grid">
-    <label>
-      Client
-      <select formControlName="client_id">
-        <option [ngValue]="0" disabled>Select client</option>
-        @for (client of clients(); track client.id) {
-          <option [ngValue]="client.id">{{ formatClientLabel(client) }}</option>
-        }
-      </select>
-    </label>
-    <label>Title <input type="text" formControlName="title" /></label>
-    <label class="full">Description <input type="text" formControlName="description" /></label>
-    <label>SLA Due <input type="datetime-local" formControlName="sla_due_at" /></label>
-    <button type="submit">Create Case</button>
-  </form>
-</section>
+
+<div class="container-fluid px-0">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+      <section class="panel mb-4">
+        <h3>Wealth Client Lifecycle Cases</h3>
+        <form [formGroup]="form" (ngSubmit)="createCase()">
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Client
+                <select class="form-select" formControlName="client_id">
+                  <option [ngValue]="0" disabled>Select client</option>
+                  @for (client of clients(); track client.id) {
+                    <option [ngValue]="client.id">{{ formatClientLabel(client) }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Title
+                <input type="text" class="form-control" formControlName="title" />
+              </label>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description
+                <input type="text" class="form-control" formControlName="description" />
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">SLA Due
+                <input type="datetime-local" class="form-control" formControlName="sla_due_at" />
+              </label>
+            </div>
+          </div>
+          <div class="mt-3 text-end">
+            <button type="submit" class="btn btn-primary">Create Case</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+</div>
 
 <section class="panel workflow-panel">
   <h3>Workflow Rules</h3>

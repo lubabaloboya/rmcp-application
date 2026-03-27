@@ -1,66 +1,85 @@
-<section class="content-grid">
-  <article class="panel">
-    <h3>Add Wealth Client</h3>
-    <form [formGroup]="form" (ngSubmit)="createClient()" class="form-grid compact">
-      <label>
-        Company (Optional)
-        <select formControlName="company_id">
-          <option [value]="0">No linked company</option>
-          @if (companies().length === 0) {
-            <option [value]="0" disabled>No companies available</option>
-          } @else {
-            @for (company of companies(); track company.id) {
-              <option [value]="company.id">{{ company.company_name }} (ID: {{ company.id }})</option>
-            }
-          }
-        </select>
-      </label>
-      <label>
-        Client Type
-        <select formControlName="client_type">
-          <option value="individual">Individual</option>
-          <option value="company">Company</option>
-        </select>
-      </label>
-      <label>
-        First Name
-        <input type="text" formControlName="first_name" />
-      </label>
-      <label>
-        Last Name
-        <input type="text" formControlName="last_name" />
-      </label>
-      <label>
-        Email
-        <input type="email" formControlName="email" />
-      </label>
-      <label>
-        Phone
-        <input type="text" formControlName="phone" />
-      </label>
-      <label class="full-width">
-        Address
-        <input type="text" formControlName="address" />
-      </label>
-      <label>
-        Source of Wealth
-        <input type="text" formControlName="source_of_wealth" placeholder="Salary, business sale, inheritance" />
-      </label>
-      <label>
-        Source of Funds
-        <input type="text" formControlName="source_of_funds" placeholder="Monthly income, investment returns" />
-      </label>
-      <label>
-        Annual Income Band
-        <select formControlName="annual_income_band">
-          <option value="">Select band</option>
-          <option value="below_100k">Below 100k</option>
-          <option value="100k-500k">100k - 500k</option>
-          <option value="500k-2m">500k - 2m</option>
-          <option value="2m+">2m+</option>
-        </select>
-      </label>
-      <label>
+<div class="container-fluid px-0">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+      <article class="panel mb-4">
+        <h3>Add Wealth Client</h3>
+        <form [formGroup]="form" (ngSubmit)="createClient()">
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Company (Optional)
+                <select class="form-select" formControlName="company_id">
+                  <option [value]="0">No linked company</option>
+                  @if (companies().length === 0) {
+                    <option [value]="0" disabled>No companies available</option>
+                  } @else {
+                    @for (company of companies(); track company.id) {
+                      <option [value]="company.id">{{ company.company_name }} (ID: {{ company.id }})</option>
+                    }
+                  }
+                </select>
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Client Type
+                <select class="form-select" formControlName="client_type">
+                  <option value="individual">Individual</option>
+                  <option value="company">Company</option>
+                </select>
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">First Name
+                <input type="text" class="form-control" formControlName="first_name" />
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Last Name
+                <input type="text" class="form-control" formControlName="last_name" />
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Email
+                <input type="email" class="form-control" formControlName="email" />
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Phone
+                <input type="text" class="form-control" formControlName="phone" />
+              </label>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Address
+                <input type="text" class="form-control" formControlName="address" />
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Source of Wealth
+                <input type="text" class="form-control" formControlName="source_of_wealth" placeholder="Salary, business sale, inheritance" />
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Source of Funds
+                <input type="text" class="form-control" formControlName="source_of_funds" placeholder="Monthly income, investment returns" />
+              </label>
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Annual Income Band
+                <select class="form-select" formControlName="annual_income_band">
+                  <option value="">Select band</option>
+                  <option value="below_100k">Below 100k</option>
+                  <option value="100k-500k">100k - 500k</option>
+                  <option value="500k-2m">500k - 2m</option>
+                  <option value="2m+">2m+</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="mt-3 text-end">
+            <button type="submit" class="btn btn-primary">Add Client</button>
+          </div>
+        </form>
+  <!-- Removed extra closing tags above -->
+  <label>
         Net Worth Band
         <select formControlName="net_worth_band">
           <option value="">Select band</option>
@@ -84,7 +103,6 @@
         </select>
       </label>
       <button type="submit" [disabled]="loading()">{{ loading() ? 'Saving...' : 'Create Client' }}</button>
-    </form>
   </article>
 
   <article class="panel">
@@ -95,8 +113,7 @@
       <div><span>High</span><strong>{{ highCount() }}</strong></div>
     </div>
   </article>
-</section>
-
+<!-- Removed extra closing tag above -->
 <section class="panel">
   <h3>Bulk Upload Clients (Excel)</h3>
   <p>Upload .xlsx/.xls file with columns: company_id (optional), client_type, first_name, last_name, email, phone, address, id_number, passport_number, source_of_wealth, source_of_funds, annual_income_band, net_worth_band, investment_objective, wealth_profile_status.</p>

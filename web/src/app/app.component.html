@@ -1,46 +1,47 @@
 <main class="rmcp-shell" [class.authenticated]="isAuthenticated()">
   @if (isAuthenticated()) {
-    <aside class="sidebar panel">
-      <div class="brand-block">
-        <p class="eyebrow">Risk Management & Compliance Platform</p>
-        <h1>RMCP Control Center</h1>
+    <!-- Hamburger button for mobile -->
+    <button class="sidebar-toggle" (click)="sidebarOpen = !sidebarOpen" *ngIf="isMobile()">
+      &#9776;
+    </button>
+    <aside class="sidebar panel" [class.open]="sidebarOpen || !isMobile()">
+      <div class="brand-block sidebar-logo">
+        <img src="assets/logo.svg" alt="Logo" class="logo" />
       </div>
-
-      <nav class="nav-links">
-        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <nav class="nav-links vertical-nav">
+        <a routerLink="/dashboard" routerLinkActive="active" title="Dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a>
         @if (hasPermission('clients.view')) {
-          <a routerLink="/clients" routerLinkActive="active">Clients</a>
+          <a routerLink="/clients" routerLinkActive="active" title="Clients"><i class="fas fa-users"></i><span>Clients</span></a>
         }
         @if (hasPermission('cases.view')) {
-          <a routerLink="/cases" routerLinkActive="active">Cases</a>
+          <a routerLink="/cases" routerLinkActive="active" title="Cases"><i class="fas fa-briefcase"></i><span>Cases</span></a>
         }
         @if (hasPermission('directors.view')) {
-          <a routerLink="/governance" routerLinkActive="active">Governance</a>
+          <a routerLink="/governance" routerLinkActive="active" title="Governance"><i class="fas fa-balance-scale"></i><span>Governance</span></a>
         }
         @if (hasPermission('incidents.view')) {
-          <a routerLink="/incidents" routerLinkActive="active">Incidents</a>
+          <a routerLink="/incidents" routerLinkActive="active" title="Incidents"><i class="fas fa-exclamation-triangle"></i><span>Incidents</span></a>
         }
         @if (hasPermission('tasks.view')) {
-          <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+          <a routerLink="/tasks" routerLinkActive="active" title="Tasks"><i class="fas fa-tasks"></i><span>Tasks</span></a>
         }
         @if (hasPermission('communications.view')) {
-          <a routerLink="/communications" routerLinkActive="active">Comms</a>
+          <a routerLink="/communications" routerLinkActive="active" title="Comms"><i class="fas fa-envelope"></i><span>Comms</span></a>
         }
         @if (hasPermission('companies.view')) {
-          <a routerLink="/companies" routerLinkActive="active">Companies</a>
+          <a routerLink="/companies" routerLinkActive="active" title="Companies"><i class="fas fa-building"></i><span>Companies</span></a>
         }
         @if (hasPermission('audit_logs.view')) {
-          <a routerLink="/audit-logs" routerLinkActive="active">Audit</a>
+          <a routerLink="/audit-logs" routerLinkActive="active" title="Audit"><i class="fas fa-clipboard-list"></i><span>Audit</span></a>
         }
         @if (hasPermission('roles.view')) {
-          <a routerLink="/roles" routerLinkActive="active">Roles</a>
-          <a routerLink="/compliance-automation" routerLinkActive="active">Compliance</a>
+          <a routerLink="/roles" routerLinkActive="active" title="Roles"><i class="fas fa-user-shield"></i><span>Roles</span></a>
+          <a routerLink="/compliance-automation" routerLinkActive="active" title="Compliance"><i class="fas fa-cogs"></i><span>Compliance</span></a>
         }
       </nav>
-
       <div class="sidebar-footer">
-        <span class="user">{{ userName() }}</span>
-        <button type="button" class="ghost" (click)="logout()">Logout</button>
+        <span class="user"><i class="fas fa-user"></i> {{ userName() }}</span>
+        <button type="button" class="ghost" (click)="logout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
       </div>
     </aside>
 

@@ -5,9 +5,6 @@
     <p>Sign in to access dashboard analytics and client monitoring tools.</p>
   </div>
   <div class="chips">
-    <span>Docker Ready</span>
-    <span>SQL Server</span>
-    <span>JWT</span>
   </div>
 </section>
 
@@ -16,11 +13,11 @@
   <form [formGroup]="form" (ngSubmit)="login()" class="form-grid">
     <label>
       Email
-      <input type="email" formControlName="email" placeholder="admin@rmcp.local" />
+      <input type="email" formControlName="email" placeholder="" />
     </label>
     <label>
       Password
-      <input type="password" formControlName="password" placeholder="Admin@12345" />
+      <input type="password" formControlName="password" placeholder="" />
     </label>
     <button type="submit" [disabled]="loading()">{{ loading() ? 'Signing in...' : 'Sign In' }}</button>
   </form>

@@ -48,7 +48,7 @@ return new class extends Migration {
 
         Schema::create('company_directors', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained('companies')->noActionOnDelete();
             $table->string('first_name');
             $table->string('last_name');
             $table->string('id_number')->nullable();
@@ -58,7 +58,7 @@ return new class extends Migration {
 
         Schema::create('shareholders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained('companies')->noActionOnDelete();
             $table->string('shareholder_name');
             $table->decimal('ownership_percentage', 5, 2)->default(0);
             $table->timestamps();
@@ -66,7 +66,7 @@ return new class extends Migration {
 
         Schema::create('beneficial_owners', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained('companies')->noActionOnDelete();
             $table->string('name');
             $table->string('id_number')->nullable();
             $table->decimal('ownership_percentage', 5, 2)->default(0);
@@ -83,7 +83,7 @@ return new class extends Migration {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->nullable()->constrained('clients')->nullOnDelete();
-            $table->foreignId('company_id')->nullable()->constrained('companies');
+            $table->foreignId('company_id')->nullable()->constrained('companies')->noActionOnDelete();
             $table->foreignId('document_type_id')->constrained('document_types')->noActionOnDelete();
             $table->string('file_path');
             $table->date('expiry_date')->nullable();
