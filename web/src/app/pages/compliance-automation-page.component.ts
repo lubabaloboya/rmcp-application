@@ -16,8 +16,7 @@ import { ToastService } from '../core/toast.service';
   selector: 'app-compliance-automation-page',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './compliance-automation-page.component.html',
-  styleUrl: './compliance-automation-page.component.scss'
+  templateUrl: './compliance-automation-page.component.html', styleUrls: ['./compliance-automation-page.component.scss']
 })
 export class ComplianceAutomationPageComponent implements OnInit {
     // For user-friendly filtering
@@ -206,3 +205,5 @@ export class ComplianceAutomationPageComponent implements OnInit {
     });
   }
 }
+
+

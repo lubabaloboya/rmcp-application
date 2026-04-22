@@ -1,6 +1,6 @@
 :host {
-	display: grid;
-	gap: 1rem;
+  display: grid;
+  gap: 1rem;
 }
 
 .panel {
@@ -66,15 +66,49 @@
 	gap: 0.65rem;
 }
 
-label {
+label,
+.form-label {
 	display: grid;
 	gap: 0.35rem;
 	color: #4f5f64;
 	font-size: 0.84rem;
 }
 
+.communication-form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+	align-items: start;
+}
+
+.communication-form-grid > div {
+	min-width: 0;
+}
+
 .full-width {
 	grid-column: 1 / -1;
+}
+
+.filters {
+	width: 100%;
+}
+
+.filter-row {
+	display: grid;
+	grid-template-columns: 2fr repeat(4, minmax(130px, auto)) auto auto;
+	gap: 0.6rem;
+	align-items: center;
+}
+
+.filter-row button {
+	min-width: 80px;
+}
+
+@media (max-width: 900px) {
+	.communication-form-grid,
+	.filter-row {
+		grid-template-columns: 1fr;
+	}
 }
 
 input,

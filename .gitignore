@@ -1,3 +1,18 @@
+# Common configuration files to ignore
+docker-compose.yml
+docker-compose.*.yml
+docker/.env
+docker/php/entrypoint.sh
+docker/php/opcache.ini
+docker/nginx/conf.d/default.conf
+web/angular.json
+web/package-lock.json
+web/package.json
+api/.env
+api/.env.*
+api/phpunit.xml
+api/composer.lock
+api/composer.json
 # OS / editor
 .DS_Store
 Thumbs.db

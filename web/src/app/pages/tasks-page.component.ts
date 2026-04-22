@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RmcpApiService, TaskRecord } from '../core/rmcp-api.service';
 import { ToastService } from '../core/toast.service';
 
-@Component({ selector: 'app-tasks-page', standalone: true, imports: [CommonModule, ReactiveFormsModule], templateUrl: './tasks-page.component.html', styleUrl: './tasks-page.component.scss' })
+@Component({ selector: 'app-tasks-page', standalone: true, imports: [CommonModule, ReactiveFormsModule], templateUrl: './tasks-page.component.html', styleUrls: ['./tasks-page.component.scss'] })
 export class TasksPageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
   private readonly fb = inject(FormBuilder);
@@ -267,3 +267,5 @@ export class TasksPageComponent implements OnInit {
     });
   }
 }
+
+

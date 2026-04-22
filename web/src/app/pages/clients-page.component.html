@@ -1,118 +1,115 @@
-<div class="container-fluid px-0">
-  <div class="row justify-content-center">
-    <div class="col-12 col-md-10 col-lg-8">
-      <article class="panel mb-4">
-        <h3>Add Wealth Client</h3>
-        <form [formGroup]="form" (ngSubmit)="createClient()">
-          <div class="row g-3">
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Company (Optional)
-                <select class="form-select" formControlName="company_id">
-                  <option [value]="0">No linked company</option>
-                  @if (companies().length === 0) {
-                    <option [value]="0" disabled>No companies available</option>
-                  } @else {
-                    @for (company of companies(); track company.id) {
-                      <option [value]="company.id">{{ company.company_name }} (ID: {{ company.id }})</option>
-                    }
-                  }
-                </select>
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Client Type
-                <select class="form-select" formControlName="client_type">
-                  <option value="individual">Individual</option>
-                  <option value="company">Company</option>
-                </select>
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">First Name
-                <input type="text" class="form-control" formControlName="first_name" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Last Name
-                <input type="text" class="form-control" formControlName="last_name" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Email
-                <input type="email" class="form-control" formControlName="email" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Phone
-                <input type="text" class="form-control" formControlName="phone" />
-              </label>
-            </div>
-            <div class="col-12">
-              <label class="form-label">Address
-                <input type="text" class="form-control" formControlName="address" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Source of Wealth
-                <input type="text" class="form-control" formControlName="source_of_wealth" placeholder="Salary, business sale, inheritance" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Source of Funds
-                <input type="text" class="form-control" formControlName="source_of_funds" placeholder="Monthly income, investment returns" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Annual Income Band
-                <select class="form-select" formControlName="annual_income_band">
-                  <option value="">Select band</option>
-                  <option value="below_100k">Below 100k</option>
-                  <option value="100k-500k">100k - 500k</option>
-                  <option value="500k-2m">500k - 2m</option>
-                  <option value="2m+">2m+</option>
-                </select>
-              </label>
-            </div>
-          </div>
-          <div class="mt-3 text-end">
-            <button type="submit" class="btn btn-primary">Add Client</button>
-          </div>
-        </form>
-  <!-- Removed extra closing tags above -->
-  <label>
-        Net Worth Band
-        <select formControlName="net_worth_band">
-          <option value="">Select band</option>
-          <option value="below_500k">Below 500k</option>
-          <option value="500k-2m">500k - 2m</option>
-          <option value="2m-10m">2m - 10m</option>
-          <option value="10m+">10m+</option>
-        </select>
-      </label>
-      <label>
-        Investment Objective
-        <input type="text" formControlName="investment_objective" placeholder="Growth, preservation, income" />
-      </label>
-      <label>
-        Wealth Profile Status
-        <select formControlName="wealth_profile_status">
-          <option value="pending">Pending</option>
-          <option value="in_review">In Review</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-        </select>
-      </label>
-      <button type="submit" [disabled]="loading()">{{ loading() ? 'Saving...' : 'Create Client' }}</button>
-  </article>
-
-  <article class="panel">
-    <h3>Risk Distribution</h3>
-    <div class="risk-grid">
-      <div><span>Low</span><strong>{{ lowCount() }}</strong></div>
-      <div><span>Medium</span><strong>{{ mediumCount() }}</strong></div>
-      <div><span>High</span><strong>{{ highCount() }}</strong></div>
+<section class="panel">
+  <h3>Add Wealth Client</h3>
+  <form [formGroup]="form" (ngSubmit)="createClient()">
+    <div class="row g-3">
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Company (Optional)
+          <select class="form-select" formControlName="company_id">
+            <option [value]="0">No linked company</option>
+            <ng-container *ngIf="companies().length === 0">
+              <option [value]="0" disabled>No companies available</option>
+            </ng-container>
+            <ng-container *ngIf="companies().length > 0">
+              <option *ngFor="let company of companies()" [value]="company.id">{{ company.company_name }} (ID: {{ company.id }})</option>
+            </ng-container>
+          </select>
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Client Type
+          <select class="form-select" formControlName="client_type">
+            <option value="individual">Individual</option>
+            <option value="company">Company</option>
+          </select>
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">First Name
+          <input type="text" class="form-control" formControlName="first_name" />
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Last Name
+          <input type="text" class="form-control" formControlName="last_name" />
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Email
+          <input type="email" class="form-control" formControlName="email" />
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Phone
+          <input type="text" class="form-control" formControlName="phone" />
+        </label>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Address
+          <input type="text" class="form-control" formControlName="address" />
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Source of Wealth
+          <input type="text" class="form-control" formControlName="source_of_wealth" placeholder="Salary, business sale, inheritance" />
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Source of Funds
+          <input type="text" class="form-control" formControlName="source_of_funds" placeholder="Monthly income, investment returns" />
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Annual Income Band
+          <select class="form-select" formControlName="annual_income_band">
+            <option value="">Select band</option>
+            <option value="below_100k">Below 100k</option>
+            <option value="100k-500k">100k - 500k</option>
+            <option value="500k-2m">500k - 2m</option>
+            <option value="2m+">2m+</option>
+          </select>
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Net Worth Band
+          <select class="form-select" formControlName="net_worth_band">
+            <option value="">Select band</option>
+            <option value="below_500k">Below 500k</option>
+            <option value="500k-2m">500k - 2m</option>
+            <option value="2m-10m">2m - 10m</option>
+            <option value="10m+">10m+</option>
+          </select>
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Investment Objective
+          <input type="text" class="form-control" formControlName="investment_objective" placeholder="Growth, preservation, income" />
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Wealth Profile Status
+          <select class="form-select" formControlName="wealth_profile_status">
+            <option value="pending">Pending</option>
+            <option value="in_review">In Review</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </label>
+      </div>
     </div>
-  </article>
+    <div class="mt-3 text-end">
+      <button type="submit" class="btn btn-primary" [disabled]="loading()">{{ loading() ? 'Saving...' : 'Add Client' }}</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <h3>Risk Distribution</h3>
+  <div class="risk-grid">
+    <div><span>Low</span><strong>{{ lowCount() }}</strong></div>
+    <div><span>Medium</span><strong>{{ mediumCount() }}</strong></div>
+    <div><span>High</span><strong>{{ highCount() }}</strong></div>
+  </div>
+</section>
 <!-- Removed extra closing tag above -->
 <section class="panel">
   <h3>Bulk Upload Clients (Excel)</h3>
@@ -121,9 +118,7 @@
     <button type="button" class="ghost" (click)="downloadBulkTemplate()">Download Template</button>
     <input type="file" accept=".xlsx,.xls,.csv" (change)="onBulkFileSelected($event)" [disabled]="bulkUploading()" />
   </div>
-  @if (bulkUploading()) {
-    <p>Uploading and validating rows...</p>
-  }
+  <ng-container *ngIf="bulkUploading()"><p>Uploading and validating rows...</p></ng-container>
 </section>
 
 <section class="panel">
@@ -134,26 +129,24 @@
     <label>
       Client
       <select formControlName="client_id" (change)="onDocumentClientChanged($any($event.target).value)">
-        @if (clientOptions().length === 0) {
+        <ng-container *ngIf="clientOptions().length === 0">
           <option [value]="0">No clients available</option>
-        } @else {
-          @for (client of clientOptions(); track client.id) {
-            <option [value]="client.id">{{ clientDisplayName(client) }} (ID: {{ client.id }})</option>
-          }
-        }
+        </ng-container>
+        <ng-container *ngIf="clientOptions().length > 0">
+          <option *ngFor="let client of clientOptions()" [value]="client.id">{{ clientDisplayName(client) }} (ID: {{ client.id }})</option>
+        </ng-container>
       </select>
     </label>
 
     <label>
       Document Type
       <select formControlName="document_type_id">
-        @if (documentTypes().length === 0) {
+        <ng-container *ngIf="documentTypes().length === 0">
           <option [value]="0">No document types available</option>
-        } @else {
-          @for (type of documentTypes(); track type.id) {
-            <option [value]="type.id">{{ type.document_name }} ({{ type.category }})</option>
-          }
-        }
+        </ng-container>
+        <ng-container *ngIf="documentTypes().length > 0">
+          <option *ngFor="let type of documentTypes()" [value]="type.id">{{ type.document_name }} ({{ type.category }})</option>
+        </ng-container>
       </select>
     </label>
 
@@ -175,9 +168,7 @@
     </div>
   </form>
 
-  @if (loadingDocuments()) {
-    <p>Loading client documents...</p>
-  }
+  <ng-container *ngIf="loadingDocuments()"><p>Loading client documents...</p></ng-container>
 
   <div class="table-wrap">
     <table>
@@ -192,7 +183,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (document of clientDocuments(); track document.id) {
+        <ng-container *ngFor="let document of clientDocuments()">
           <tr>
             <td>{{ document.document_type_name || '-' }}</td>
             <td>{{ document.file_name }}</td>
@@ -223,11 +214,11 @@
               </div>
             </td>
           </tr>
-        } @empty {
+        </ng-container><ng-container *ngIf="!(clientDocuments()?.length)">
           <tr>
             <td colspan="6">No documents uploaded for this client yet.</td>
           </tr>
-        }
+        </ng-container>
       </tbody>
     </table>
   </div>
@@ -246,9 +237,7 @@
       </select>
     </label>
   </div>
-  @if (loadingList()) {
-    <p>Refreshing clients list...</p>
-  }
+  <ng-container *ngIf="loadingList()"><p>Refreshing clients list...</p></ng-container>
   <div class="table-wrap">
     <table>
       <thead>
@@ -263,7 +252,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (client of clients(); track client.id) {
+        <ng-container *ngFor="let client of clients()">
           <tr>
             <td>{{ client.first_name || '-' }} {{ client.last_name || '' }}</td>
             <td>{{ client.client_type }}</td>
@@ -273,11 +262,11 @@
             <td>{{ client.phone || '-' }}</td>
             <td><span class="risk-pill" [class]="'risk-pill ' + client.risk_level">{{ client.risk_level }}</span></td>
           </tr>
-        } @empty {
+        </ng-container><ng-container *ngIf="!(clients()?.length)">
           <tr>
             <td colspan="7">No clients yet.</td>
           </tr>
-        }
+        </ng-container>
       </tbody>
     </table>
   </div>
@@ -291,6 +280,6 @@
   </div>
 </section>
 
-@if (errorMessage()) {
+<ng-container *ngIf="errorMessage()">
   <section class="panel error">{{ errorMessage() }}</section>
-}
+</ng-container>

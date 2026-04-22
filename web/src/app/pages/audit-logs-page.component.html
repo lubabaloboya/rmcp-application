@@ -106,9 +106,7 @@
 <section class="panel">
   <h3>Events</h3>
 
-  @if (loading()) {
-    <p>Loading audit logs...</p>
-  }
+  <ng-container *ngIf="loading()"><p>Loading audit logs...</p></ng-container>
 
   <div class="table-wrap">
     <table>
@@ -116,7 +114,7 @@
         <tr><th>Time</th><th>User</th><th>Module</th><th>Action</th><th>Record ID</th></tr>
       </thead>
       <tbody>
-        @for (log of logs(); track log.id) {
+        <ng-container *ngFor="let log of logs()">
           <tr>
             <td>{{ log.created_at | date:'medium' }}</td>
             <td>{{ log.user?.name || 'System' }}</td>
@@ -124,9 +122,9 @@
             <td><span [class]="actionClass(log.action)">{{ log.action }}</span></td>
             <td>{{ log.record_id || '-' }}</td>
           </tr>
-        } @empty {
+        </ng-container><ng-container *ngIf="!(logs()?.length)">
           <tr><td colspan="5">No audit logs found for current filters.</td></tr>
-        }
+        </ng-container>
       </tbody>
     </table>
   </div>

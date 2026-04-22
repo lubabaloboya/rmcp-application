@@ -1,43 +1,26 @@
-<main class="rmcp-shell" [class.authenticated]="isAuthenticated()">
-  @if (isAuthenticated()) {
-    <!-- Hamburger button for mobile -->
-    <button class="sidebar-toggle" (click)="sidebarOpen = !sidebarOpen" *ngIf="isMobile()">
-      &#9776;
+<main class="rmcp-shell authenticated">
+  <ng-container *ngIf="isAuthenticated(); else guestLayout">
+    <button class="sidebar-toggle" type="button" (click)="toggleSidebar()" aria-label="Toggle navigation">
+      <i class="fas fa-bars"></i>
     </button>
-    <aside class="sidebar panel" [class.open]="sidebarOpen || !isMobile()">
+    <div class="sidebar-overlay" [class.active]="sidebarOpen()" (click)="closeSidebar()"></div>
+    <aside class="sidebar panel" [class.open]="sidebarOpen()">
       <div class="brand-block sidebar-logo">
-        <img src="assets/logo.svg" alt="Logo" class="logo" />
+        <img src="assets/logo.png" alt="Logo" class="logo" />
       </div>
       <nav class="nav-links vertical-nav">
-        <a routerLink="/dashboard" routerLinkActive="active" title="Dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a>
-        @if (hasPermission('clients.view')) {
-          <a routerLink="/clients" routerLinkActive="active" title="Clients"><i class="fas fa-users"></i><span>Clients</span></a>
-        }
-        @if (hasPermission('cases.view')) {
-          <a routerLink="/cases" routerLinkActive="active" title="Cases"><i class="fas fa-briefcase"></i><span>Cases</span></a>
-        }
-        @if (hasPermission('directors.view')) {
-          <a routerLink="/governance" routerLinkActive="active" title="Governance"><i class="fas fa-balance-scale"></i><span>Governance</span></a>
-        }
-        @if (hasPermission('incidents.view')) {
-          <a routerLink="/incidents" routerLinkActive="active" title="Incidents"><i class="fas fa-exclamation-triangle"></i><span>Incidents</span></a>
-        }
-        @if (hasPermission('tasks.view')) {
-          <a routerLink="/tasks" routerLinkActive="active" title="Tasks"><i class="fas fa-tasks"></i><span>Tasks</span></a>
-        }
-        @if (hasPermission('communications.view')) {
-          <a routerLink="/communications" routerLinkActive="active" title="Comms"><i class="fas fa-envelope"></i><span>Comms</span></a>
-        }
-        @if (hasPermission('companies.view')) {
-          <a routerLink="/companies" routerLinkActive="active" title="Companies"><i class="fas fa-building"></i><span>Companies</span></a>
-        }
-        @if (hasPermission('audit_logs.view')) {
-          <a routerLink="/audit-logs" routerLinkActive="active" title="Audit"><i class="fas fa-clipboard-list"></i><span>Audit</span></a>
-        }
-        @if (hasPermission('roles.view')) {
-          <a routerLink="/roles" routerLinkActive="active" title="Roles"><i class="fas fa-user-shield"></i><span>Roles</span></a>
-          <a routerLink="/compliance-automation" routerLinkActive="active" title="Compliance"><i class="fas fa-cogs"></i><span>Compliance</span></a>
-        }
+        <a routerLink="/dashboard" routerLinkActive="active" title="Dashboard" (click)="closeSidebar()"><i class="fas fa-home"></i><span>Dashboard</span></a>
+        <a *ngIf="hasPermission('clients.view')" routerLink="/clients" routerLinkActive="active" title="Clients" (click)="closeSidebar()"><i class="fas fa-users"></i><span>Clients</span></a>
+        <a *ngIf="hasPermission('cases.view')" routerLink="/cases" routerLinkActive="active" title="Cases" (click)="closeSidebar()"><i class="fas fa-briefcase"></i><span>Cases</span></a>
+        <a *ngIf="hasPermission('directors.view')" routerLink="/governance" routerLinkActive="active" title="Governance" (click)="closeSidebar()"><i class="fas fa-balance-scale"></i><span>Governance</span></a>
+        <a *ngIf="hasPermission('incidents.view')" routerLink="/incidents" routerLinkActive="active" title="Incidents" (click)="closeSidebar()"><i class="fas fa-exclamation-triangle"></i><span>Incidents</span></a>
+        <a *ngIf="hasPermission('tasks.view')" routerLink="/tasks" routerLinkActive="active" title="Tasks" (click)="closeSidebar()"><i class="fas fa-tasks"></i><span>Tasks</span></a>
+        <a *ngIf="hasPermission('communications.view')" routerLink="/communications" routerLinkActive="active" title="Comms" (click)="closeSidebar()"><i class="fas fa-envelope"></i><span>Comms</span></a>
+        <a *ngIf="hasPermission('companies.view')" routerLink="/companies" routerLinkActive="active" title="Companies" (click)="closeSidebar()"><i class="fas fa-building"></i><span>Companies</span></a>
+        <a *ngIf="hasPermission('audit_logs.view')" routerLink="/audit-logs" routerLinkActive="active" title="Audit" (click)="closeSidebar()"><i class="fas fa-clipboard-list"></i><span>Audit</span></a>
+        <a *ngIf="hasPermission('roles.view')" routerLink="/roles" routerLinkActive="active" title="Roles" (click)="closeSidebar()"><i class="fas fa-user-shield"></i><span>Roles</span></a>
+        <a *ngIf="isAdmin()" routerLink="/users" routerLinkActive="active" title="Users" (click)="closeSidebar()"><i class="fas fa-users-cog"></i><span>Users</span></a>
+        <a *ngIf="hasPermission('roles.view')" routerLink="/compliance-automation" routerLinkActive="active" title="Compliance" (click)="closeSidebar()"><i class="fas fa-cogs"></i><span>Compliance</span></a>
       </nav>
       <div class="sidebar-footer">
         <span class="user"><i class="fas fa-user"></i> {{ userName() }}</span>
@@ -46,27 +29,74 @@
     </aside>
 
     <section class="content-area">
-      @if (booting()) {
+      <ng-container *ngIf="booting(); else authenticatedContent">
         <section class="panel">Loading session...</section>
-      } @else {
+      </ng-container>
+      <ng-template #authenticatedContent>
         <router-outlet />
-      }
+      </ng-template>
     </section>
-  } @else {
+
+    <aside class="right-sidebar">
+      <div class="sidebar-widget panel">
+        <h4>Quick Stats</h4>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-number">{{ getTotalClients() }}</span>
+            <span class="stat-label">Total Clients</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ getActiveCases() }}</span>
+            <span class="stat-label">Active Cases</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ getPendingTasks() }}</span>
+            <span class="stat-label">Pending Tasks</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-widget panel">
+        <h4>Recent Activity</h4>
+        <ul class="activity-list">
+          <li *ngFor="let activity of recentActivities()">
+            <i [class]="activity.icon"></i>
+            <span>{{ activity.description }}</span>
+            <small>{{ activity.time }}</small>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-widget panel">
+        <h4>Notifications</h4>
+        <ul class="notification-list">
+          <li *ngFor="let notification of notifications()">
+            <i [class]="notification.icon"></i>
+            <span>{{ notification.message }}</span>
+            <small>{{ notification.time }}</small>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+  </ng-container>
+
+  <ng-template #guestLayout>
     <section class="auth-area">
-      @if (booting()) {
+      <ng-container *ngIf="booting(); else guestContent">
         <section class="panel">Loading session...</section>
-      } @else {
+      </ng-container>
+      <ng-template #guestContent>
         <router-outlet />
-      }
+      </ng-template>
     </section>
-  }
+  </ng-template>
 
   <app-toast-container />
-</main>
 
-@if (isProcessing()) {
-  <div class="top-progress" role="status" aria-live="polite" aria-label="Processing request">
-    <span class="top-progress-bar" aria-hidden="true"></span>
-  </div>
-}
+  <ng-container *ngIf="isProcessing()">
+    <div class="top-progress" role="status" aria-live="polite" aria-label="Processing request">
+      <span class="top-progress-bar" aria-hidden="true"></span>
+    </div>
+  </ng-container>
+</main>

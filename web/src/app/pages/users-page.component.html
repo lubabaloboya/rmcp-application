@@ -1,0 +1,144 @@
+<section class="page-header">
+  <h1>User Management</h1>
+  <p>Manage system users and their role assignments</p>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Users</h2>
+    <button type="button" class="primary" (click)="openCreateUserModal()">
+      <i class="fas fa-plus"></i>
+      Add User
+    </button>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users()">
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role_name }}</td>
+          <td>
+            <span class="status" [class.active]="user.status === 'active'" [class.inactive]="user.status === 'inactive'">
+              {{ user.status === 'active' ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td>{{ user.last_login_at | date:'short' }}</td>
+          <td>
+            <button type="button" class="ghost small" (click)="editUser(user)" title="Edit User">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="ghost small" [class.danger]="user.status === 'active'" (click)="toggleUserStatus(user)" [title]="user.status === 'active' ? 'Deactivate User' : 'Activate User'">
+              <i class="fas" [class.fa-ban]="user.status === 'active'" [class.fa-check]="user.status === 'inactive'"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Create User Modal -->
+<div *ngIf="showCreateModal()" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Create New User</h3>
+      <button type="button" class="close" (click)="closeCreateModal()">&times;</button>
+    </div>
+    <form [formGroup]="createForm" (ngSubmit)="createUser()" class="modal-body">
+      <div class="form-row">
+        <label>
+          Name
+          <input type="text" formControlName="name" placeholder="Enter full name" />
+        </label>
+        <label>
+          Email
+          <input type="email" formControlName="email" placeholder="Enter email address" />
+        </label>
+      </div>
+      <div class="form-row">
+        <label>
+          Password
+          <input type="password" formControlName="password" placeholder="Enter password" />
+        </label>
+        <label>
+          Role ID
+          <input type="number" formControlName="role_id" placeholder="Enter role ID" />
+        </label>
+      </div>
+      <div class="form-row">
+        <label>
+          Company ID (Optional)
+          <input type="number" formControlName="company_id" placeholder="Enter company ID" />
+        </label>
+        <label>
+          Status
+          <select formControlName="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="secondary" (click)="closeCreateModal()">Cancel</button>
+        <button type="submit" class="primary" [disabled]="createForm.invalid">Create User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div *ngIf="showEditModal()" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Edit User</h3>
+      <button type="button" class="close" (click)="closeEditModal()">&times;</button>
+    </div>
+    <form [formGroup]="editForm" (ngSubmit)="updateUser()" class="modal-body">
+      <div class="form-row">
+        <label>
+          Name
+          <input type="text" formControlName="name" placeholder="Enter full name" />
+        </label>
+        <label>
+          Email
+          <input type="email" formControlName="email" placeholder="Enter email address" />
+        </label>
+      </div>
+      <div class="form-row">
+        <label>
+          Role ID
+          <input type="number" formControlName="role_id" placeholder="Enter role ID" />
+        </label>
+        <label>
+          Company ID (Optional)
+          <input type="number" formControlName="company_id" placeholder="Enter company ID" />
+        </label>
+      </div>
+      <div class="form-row">
+        <label>
+          Status
+          <select formControlName="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="secondary" (click)="closeEditModal()">Cancel</button>
+        <button type="submit" class="primary" [disabled]="editForm.invalid">Update User</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,25 +1,21 @@
 
-<div class="container-fluid px-0">
-  <div class="row g-3">
-    @for (metric of chartData(); track metric.key) {
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <article class="stat-card panel mb-3 h-100" [class]="'stat-card panel ' + metric.tone">
+<section class="stats-grid">
+  <ng-container *ngFor="let metric of chartData()">
+    <article class="stat-card panel" [class]="'stat-card panel ' + metric.tone">
           <h3>{{ metric.label }}</h3>
           <p class="metric">{{ metric.value }}</p>
           <div class="spark-track" aria-hidden="true">
             <span class="spark-fill" [style.width.%]="metric.percent"></span>
           </div>
-        </article>
-      </div>
-    }
-  </div>
-</div>
+    </article>
+  </ng-container>
+</section>
 
 <section class="panel chart-panel mt-3">
   <h3>Wealth Operations Snapshot</h3>
   <p class="chart-caption">Visual comparison of wealth onboarding, vetting, and compliance workload.</p>
   <div class="bar-chart">
-    @for (metric of chartData(); track metric.key) {
+    <ng-container *ngFor="let metric of chartData()">
       <div class="bar-row d-flex flex-wrap align-items-center mb-2">
         <span class="bar-label flex-grow-1">{{ metric.label }}</span>
         <div class="bar-track flex-grow-1 mx-2" aria-hidden="true">
@@ -27,42 +23,39 @@
         </div>
         <span class="bar-value">{{ metric.value }}</span>
       </div>
-    }
+    </ng-container>
   </div>
 </section>
 
 <section class="panel mt-3">
   <h3>Recent Incidents ({{ incidentCount() }})</h3>
   <ul class="incident-list list-group list-group-flush">
-    @for (incident of dashboard()?.recent_incidents ?? []; track $index) {
-      <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
+    <ng-container *ngIf="dashboard()?.recent_incidents?.length; else noIncidents">
+      <li *ngFor="let incident of dashboard()?.recent_incidents" class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
         <strong>{{ incident.incident_type }}</strong>
         <span class="text-muted small">{{ incident.severity }} | {{ incident.status }}</span>
       </li>
-    } @empty {
+    </ng-container>
+    <ng-template #noIncidents>
       <li class="list-group-item">No incidents reported.</li>
-    }
+    </ng-template>
   </ul>
 </section>
 
 <section class="panel mt-3">
   <h3>Recent Screening Matches ({{ screeningMatchCount() }})</h3>
   <ul class="incident-list list-group list-group-flush">
-    @for (item of dashboard()?.recent_screening_matches ?? []; track $index) {
-      <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
+    <ng-container *ngIf="dashboard()?.recent_screening_matches?.length; else noMatches">
+      <li *ngFor="let item of dashboard()?.recent_screening_matches" class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
         <strong>Client #{{ item.client_id }} | {{ item.check_type }}</strong>
         <span class="text-muted small">{{ item.status }} | {{ item.provider || 'provider-n/a' }} | {{ item.checked_at || '-' }}</span>
       </li>
-    } @empty {
+    </ng-container>
+    <ng-template #noMatches>
       <li class="list-group-item">No recent screening matches.</li>
-    }
+    </ng-template>
   </ul>
 </section>
 
-@if (loading()) {
-  <section class="panel status mt-3">Loading dashboard...</section>
-}
-
-@if (errorMessage()) {
-  <section class="panel status error">{{ errorMessage() }}</section>
-}
+<section *ngIf="loading()" class="panel status mt-3">Loading dashboard...</section>
+<section *ngIf="errorMessage()" class="panel status error">{{ errorMessage() }}</section>

@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\CompanyDirectorController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ShareholderController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\UserController;
 
 Route::prefix('v1')->group(function (): void {
     Route::post('/auth/register', [AuthController::class, 'register']);
@@ -74,6 +75,12 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->middleware('permission:audit_logs.view');
         Route::get('/roles', [RoleController::class, 'index'])->middleware('permission:roles.view');
         Route::patch('/roles/{role}', [RoleController::class, 'update'])->middleware('permission:roles.edit');
+        Route::get('/users', [UserController::class, 'index'])->middleware('permission:roles.view');
+        Route::post('/users', [UserController::class, 'store'])->middleware('permission:roles.edit');
+        Route::get('/users/{user}', [UserController::class, 'show'])->middleware('permission:roles.view');
+        Route::patch('/users/{user}', [UserController::class, 'update'])->middleware('permission:roles.edit');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:roles.edit');
+        Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->middleware('permission:roles.edit');
         Route::get('/risk-rules', [RiskRuleController::class, 'index'])->middleware('permission:roles.view');
         Route::patch('/risk-rules/{riskRule}', [RiskRuleController::class, 'update'])->middleware('permission:roles.edit');
         Route::get('/document-checklists', [DocumentChecklistController::class, 'index'])->middleware('permission:documents.view');

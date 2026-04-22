@@ -30,7 +30,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (rule of filteredRules(); track rule.id) {
+          <ng-container *ngFor="let rule of filteredRules()">
             <tr>
               <td>{{ rule.label }}</td>
               <td>
@@ -60,11 +60,11 @@
                 />
               </td>
             </tr>
-          } @empty {
+          </ng-container><ng-container *ngIf="!(filteredRules()?.length)">
             <tr>
               <td colspan="4">No risk rules found.</td>
             </tr>
-          }
+          </ng-container>
         </tbody>
       </table>
     </div>
@@ -79,14 +79,14 @@
     </div>
 
     <div class="checklist-grid">
-      @for (type of documentTypes(); track type.id) {
+      <ng-container *ngFor="let type of documentTypes()">
         <label>
           <input type="checkbox" [checked]="requiredTypeIds().includes(type.id)" (change)="toggleRequiredType(type.id)" />
           {{ type.document_name }}
         </label>
-      } @empty {
+      </ng-container><ng-container *ngIf="!(documentTypes()?.length)">
         <p>No document types found.</p>
-      }
+      </ng-container>
     </div>
 
     <button type="button" [disabled]="savingChecklist()" (click)="saveChecklist()">
@@ -104,11 +104,11 @@
       Client
       <input type="text" placeholder="Search clients..." (input)="filterClients($any($event.target).value)" style="margin-bottom:0.5rem;width:100%" />
       <select [value]="selectedClientId()" (change)="onClientChange($any($event.target).value)">
-        @for (client of filteredClients(); track client.id) {
+        <ng-container *ngFor="let client of filteredClients()">
           <option [value]="client.id">{{ (client.first_name || '') + ' ' + (client.last_name || '') }} (ID: {{ client.id }})</option>
-        } @empty {
+        </ng-container><ng-container *ngIf="!(filteredClients()?.length)">
           <option [value]="0">No clients available</option>
-        }
+        </ng-container>
       </select>
     </label>
 
@@ -118,20 +118,20 @@
     </button>
   </div>
 
-  @if (latestAssessment(); as assessment) {
+  <ng-container *ngIf="latestAssessment() !== null">
     <article class="assessment-card">
       <h5>Latest Risk Output for {{ selectedClientName() }}</h5>
-      <p><strong>Level:</strong> {{ assessment.risk_level }} | <strong>Score:</strong> {{ assessment.risk_score }}</p>
-      <p><strong>Trigger:</strong> {{ assessment.trigger_reason || '-' }}</p>
+      <p><strong>Level:</strong> {{ latestAssessment()!.risk_level }} | <strong>Score:</strong> {{ latestAssessment()!.risk_score }}</p>
+      <p><strong>Trigger:</strong> {{ latestAssessment()!.trigger_reason || '-' }}</p>
       <ul>
-        @for (reason of assessment.explanation_json || []; track reason.rule_key) {
+        <ng-container *ngFor="let reason of latestAssessment()!.explanation_json || []">
           <li>{{ reason.label }} (+{{ reason.weight }})</li>
-        } @empty {
+        </ng-container><ng-container *ngIf="!(latestAssessment()!.explanation_json || []?.length)">
           <li>No explanation entries.</li>
-        }
+        </ng-container>
       </ul>
     </article>
-  }
+  </ng-container>
 
   <div class="table-wrap">
     <table>
@@ -146,7 +146,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (row of screeningHistory(); track row.id) {
+        <ng-container *ngFor="let row of screeningHistory()">
           <tr>
             <td>{{ row.checked_at || '-' }}</td>
             <td>{{ row.check_type }}</td>
@@ -155,11 +155,11 @@
             <td>{{ row.score }}</td>
             <td>{{ row.monitoring_cycle }}</td>
           </tr>
-        } @empty {
+        </ng-container><ng-container *ngIf="!(screeningHistory()?.length)">
           <tr>
             <td colspan="6">No screening history for selected client.</td>
           </tr>
-        }
+        </ng-container>
       </tbody>
     </table>
   </div>

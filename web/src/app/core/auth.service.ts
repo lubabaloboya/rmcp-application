@@ -32,7 +32,9 @@ export class AuthService {
   readonly userRole = signal<string>('');
   readonly permissions = signal<string[]>([]);
   readonly isAuthenticated = computed(() => this.token().length > 0);
-  readonly isAdmin = computed(() => this.hasPermission('*') || this.hasPermission('roles.edit'));
+  readonly isAdmin = computed(
+    () => this.hasPermission('*') || this.hasPermission('roles.view') || this.hasPermission('roles.edit')
+  );
 
   login(credentials: { email: string; password: string }): Observable<void> {
     return this.http.post<LoginResponse>(`${this.apiBase}/auth/login`, credentials).pipe(

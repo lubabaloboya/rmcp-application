@@ -8,8 +8,7 @@ import { ToastService } from '../core/toast.service';
   selector: 'app-incidents-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './incidents-page.component.html',
-  styleUrl: './incidents-page.component.scss'
+  templateUrl: './incidents-page.component.html', styleUrls: ['./incidents-page.component.scss']
 })
 export class IncidentsPageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
@@ -239,3 +238,5 @@ export class IncidentsPageComponent implements OnInit {
     });
   }
 }
+
+

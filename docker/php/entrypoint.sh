@@ -64,6 +64,12 @@ fi
 php artisan migrate --force
 php artisan db:seed --force
 
+# Warm Laravel caches so every request doesn't re-parse config/routes/views
+php artisan config:cache
+php artisan route:cache
+php artisan event:cache
+php artisan view:cache
+
 php artisan schedule:work >/dev/stdout 2>/dev/stderr &
 
 exec php-fpm -F

@@ -38,9 +38,7 @@
     <label class="full-width">
       Title
       <input type="text" formControlName="title" placeholder="e.g. Validate high-risk onboarding documents" [class.invalid]="isFieldInvalid('title')" />
-      @if (isFieldInvalid('title')) {
-        <span class="field-error">{{ fieldError('title') }}</span>
-      }
+      <ng-container *ngIf="isFieldInvalid('title')"><span class="field-error">{{ fieldError('title') }}</span></ng-container>
     </label>
 
     <label class="full-width">
@@ -125,9 +123,7 @@
 <section class="panel">
   <h3>Task List</h3>
 
-  @if (loading()) {
-    <p>Loading tasks...</p>
-  }
+  <ng-container *ngIf="loading()"><p>Loading tasks...</p></ng-container>
 
   <div class="table-wrap">
     <table>
@@ -135,7 +131,7 @@
         <tr><th>Title</th><th>Status</th><th>Due</th><th>Actions</th></tr>
       </thead>
       <tbody>
-        @for (t of tasks(); track t.id) {
+        <ng-container *ngFor="let t of tasks()">
           <tr>
             <td>
               <strong>{{ t.title }}</strong>
@@ -153,9 +149,9 @@
               <button type="button" class="danger" (click)="deleteTask(t)">Delete</button>
             </td>
           </tr>
-        } @empty {
+        </ng-container><ng-container *ngIf="!(tasks()?.length)">
           <tr><td colspan="4">No tasks match the current filter.</td></tr>
-        }
+        </ng-container>
       </tbody>
     </table>
   </div>

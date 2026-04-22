@@ -40,9 +40,7 @@
         placeholder="e.g. Sanctions alert, suspicious transfer"
         [class.invalid]="isFieldInvalid('incident_type')"
       />
-      @if (isFieldInvalid('incident_type')) {
-        <span class="field-error">{{ fieldError('incident_type') }}</span>
-      }
+      <ng-container *ngIf="isFieldInvalid('incident_type')"><span class="field-error">{{ fieldError('incident_type') }}</span></ng-container>
     </label>
 
     <label>
@@ -76,9 +74,7 @@
         <span>Minimum 10 characters</span>
         <span>{{ descriptionLength() }} chars</span>
       </div>
-      @if (isFieldInvalid('description')) {
-        <span class="field-error">{{ fieldError('description') }}</span>
-      }
+      <ng-container *ngIf="isFieldInvalid('description')"><span class="field-error">{{ fieldError('description') }}</span></ng-container>
     </label>
 
     <div class="form-actions full-width">
@@ -160,7 +156,7 @@
   <h3>Incident Feed</h3>
   <p class="panel-help">Review severity, status, reporter, and update progress inline.</p>
   <ul class="incident-list">
-    @for (incident of incidents(); track incident.id) {
+    <ng-container *ngFor="let incident of incidents()">
       <li>
         <div class="incident-card">
           <div class="incident-header-row">
@@ -183,9 +179,9 @@
           </div>
         </div>
       </li>
-    } @empty {
+    </ng-container><ng-container *ngIf="!(incidents()?.length)">
       <li>No incidents match the selected filters.</li>
-    }
+    </ng-container>
   </ul>
 </section>
 
@@ -197,10 +193,6 @@
   </div>
 </section>
 
-@if (loading()) {
-  <section class="panel status">Loading incidents...</section>
-}
+<ng-container *ngIf="loading()"><section class="panel status">Loading incidents...</section></ng-container>
 
-@if (errorMessage()) {
-  <section class="panel status error">{{ errorMessage() }}</section>
-}
+<ng-container *ngIf="errorMessage()"><section class="panel status error">{{ errorMessage() }}</section></ng-container>

@@ -7,8 +7,7 @@ import { ToastService } from '../core/toast.service';
   selector: 'app-audit-logs-page',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './audit-logs-page.component.html',
-  styleUrl: './audit-logs-page.component.scss',
+  templateUrl: './audit-logs-page.component.html', styleUrls: ['./audit-logs-page.component.scss'],
 })
 export class AuditLogsPageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
@@ -213,3 +212,5 @@ export class AuditLogsPageComponent implements OnInit {
     });
   }
 }
+
+

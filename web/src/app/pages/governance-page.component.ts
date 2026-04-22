@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../core/auth.service';
 import { BeneficialOwnerRecord, CompanyRecord, DirectorRecord, RmcpApiService, ShareholderRecord } from '../core/rmcp-api.service';
 import { ToastService } from '../core/toast.service';
 
@@ -9,11 +10,11 @@ import { ToastService } from '../core/toast.service';
   selector: 'app-governance-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './governance-page.component.html',
-  styleUrl: './governance-page.component.scss'
+  templateUrl: './governance-page.component.html', styleUrls: ['./governance-page.component.scss']
 })
 export class GovernancePageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
+  private readonly auth = inject(AuthService);
   private readonly fb = inject(FormBuilder);
   private readonly toast = inject(ToastService);
 
@@ -53,7 +54,13 @@ export class GovernancePageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadCompanies();
+    if (this.auth.hasPermission('companies.view')) {
+      this.loadCompanies();
+    } else {
+      this.companies.set([]);
+      this.selectedCompanyId.set(0);
+      this.syncFormsCompanyId(0);
+    }
   }
 
   onCompanyChange(raw: string): void {
@@ -218,3 +225,5 @@ export class GovernancePageComponent implements OnInit {
     this.api.getBeneficialOwners(companyId).subscribe({ next: (list) => this.owners.set(list) });
   }
 }
+
+

@@ -53,6 +53,7 @@ class AuthController extends Controller
 
         $user = JWTAuth::setToken($token)->toUser();
         if ($user instanceof User) {
+            $user->update(['last_login_at' => now()]);
             $user->load('role');
         }
 

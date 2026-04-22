@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ClientRecord, CommunicationRecord, RmcpApiService } from '../core/rmcp-api.service';
 import { ToastService } from '../core/toast.service';
 
-@Component({ selector: 'app-communications-page', standalone: true, imports: [CommonModule, ReactiveFormsModule], templateUrl: './communications-page.component.html', styleUrl: './communications-page.component.scss' })
+@Component({ selector: 'app-communications-page', standalone: true, imports: [CommonModule, ReactiveFormsModule], templateUrl: './communications-page.component.html', styleUrls: ['./communications-page.component.scss'] })
 export class CommunicationsPageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
   private readonly fb = inject(FormBuilder);
@@ -22,6 +22,7 @@ export class CommunicationsPageComponent implements OnInit {
   readonly currentPage = signal(1);
   readonly lastPage = signal(1);
   readonly total = signal(0);
+  readonly errorMessage = signal('');
 
   readonly totalCount = computed(() => this.total());
   readonly withSubjectCount = computed(() => this.communications().filter((item) => !!(item.email_subject ?? '').trim()).length);
@@ -108,6 +109,7 @@ export class CommunicationsPageComponent implements OnInit {
     }
 
     this.submitting.set(true);
+    this.errorMessage.set('');
     const payload = this.form.getRawValue();
     this.api.createCommunication(payload).subscribe({
       next: (item) => {
@@ -121,6 +123,7 @@ export class CommunicationsPageComponent implements OnInit {
       },
       error: () => {
         this.submitting.set(false);
+        this.errorMessage.set('Failed to save communication.');
         this.toast.error('Failed to save communication.');
       },
     });
@@ -184,6 +187,7 @@ export class CommunicationsPageComponent implements OnInit {
 
   private reload(): void {
     this.loading.set(true);
+    this.errorMessage.set('');
     this.api.getCommunications({
       linked_client_id: this.selectedClientFilter() > 0 ? this.selectedClientFilter() : undefined,
       q: this.searchTerm().trim() || undefined,
@@ -201,6 +205,7 @@ export class CommunicationsPageComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
+        this.errorMessage.set('Failed to load communications.');
         this.toast.error('Failed to load communications.');
       }
     });
@@ -215,8 +220,11 @@ export class CommunicationsPageComponent implements OnInit {
         }
       },
       error: () => {
+        this.errorMessage.set('Failed to load clients for communication linkage.');
         this.toast.error('Failed to load clients for communication linkage.');
       }
     });
   }
 }
+
+

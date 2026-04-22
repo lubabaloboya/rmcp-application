@@ -8,8 +8,7 @@ import { ToastService } from '../core/toast.service';
   selector: 'app-cases-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './cases-page.component.html',
-  styleUrl: './cases-page.component.scss'
+  templateUrl: './cases-page.component.html', styleUrls: ['./cases-page.component.scss']
 })
 export class CasesPageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
@@ -343,3 +342,5 @@ export class CasesPageComponent implements OnInit {
     this.cases.update((list) => list.map((item) => (item.id === updated.id ? updated : item)));
   }
 }
+
+

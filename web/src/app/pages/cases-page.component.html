@@ -1,52 +1,46 @@
 
-<div class="container-fluid px-0">
-  <div class="row justify-content-center">
-    <div class="col-12 col-md-10 col-lg-8">
-      <section class="panel mb-4">
-        <h3>Wealth Client Lifecycle Cases</h3>
-        <form [formGroup]="form" (ngSubmit)="createCase()">
-          <div class="row g-3">
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Client
-                <select class="form-select" formControlName="client_id">
-                  <option [ngValue]="0" disabled>Select client</option>
-                  @for (client of clients(); track client.id) {
-                    <option [ngValue]="client.id">{{ formatClientLabel(client) }}</option>
-                  }
-                </select>
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Title
-                <input type="text" class="form-control" formControlName="title" />
-              </label>
-            </div>
-            <div class="col-12">
-              <label class="form-label">Description
-                <input type="text" class="form-control" formControlName="description" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">SLA Due
-                <input type="datetime-local" class="form-control" formControlName="sla_due_at" />
-              </label>
-            </div>
-          </div>
-          <div class="mt-3 text-end">
-            <button type="submit" class="btn btn-primary">Create Case</button>
-          </div>
-        </form>
-      </section>
+<section class="panel">
+  <h3>Wealth Client Lifecycle Cases</h3>
+  <form [formGroup]="form" (ngSubmit)="createCase()">
+    <div class="row g-3">
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Client
+          <select class="form-select" formControlName="client_id">
+            <option [ngValue]="0" disabled>Select client</option>
+            <ng-container *ngFor="let client of clients()">
+              <option [ngValue]="client.id">{{ formatClientLabel(client) }}</option>
+            </ng-container>
+          </select>
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Title
+          <input type="text" class="form-control" formControlName="title" />
+        </label>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Description
+          <input type="text" class="form-control" formControlName="description" />
+        </label>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">SLA Due
+          <input type="datetime-local" class="form-control" formControlName="sla_due_at" />
+        </label>
+      </div>
     </div>
-  </div>
-</div>
+    <div class="mt-3 text-end">
+      <button type="submit" class="btn btn-primary">Create Case</button>
+    </div>
+  </form>
+</section>
 
 <section class="panel workflow-panel">
   <h3>Workflow Rules</h3>
   <ul class="workflow-rules">
-    @for (rule of workflowRules; track rule) {
+    <ng-container *ngFor="let rule of workflowRules">
       <li>{{ rule }}</li>
-    }
+    </ng-container>
   </ul>
 </section>
 
@@ -83,9 +77,9 @@
       Client
       <select [value]="selectedClientFilter()" (change)="setClientFilter($any($event.target).value)">
         <option [value]="0">All clients</option>
-        @for (client of clients(); track client.id) {
+        <ng-container *ngFor="let client of clients()">
           <option [value]="client.id">{{ formatClientLabel(client) }}</option>
-        }
+        </ng-container>
       </select>
     </label>
 
@@ -107,12 +101,12 @@
 
 <section class="panel">
   <h3>Case Queue</h3>
-  @if (loading()) { <p>Loading...</p> }
+  <ng-container *ngIf="loading()"><p>Loading...</p></ng-container>
   <div class="table-wrap">
     <table>
       <thead><tr><th>#</th><th>Client</th><th>Title</th><th>Stage</th><th>Status</th><th>Next Action</th><th>SLA</th><th>Actions</th></tr></thead>
       <tbody>
-        @for (item of cases(); track item.id) {
+        <ng-container *ngFor="let item of cases()">
           <tr>
             <td>{{ item.case_number }}</td>
             <td>{{ formatCaseClient(item) }}</td>
@@ -129,9 +123,9 @@
               <button type="button" [disabled]="!canClose(item)" (click)="closeCase(item)">Close</button>
             </td>
           </tr>
-        } @empty {
+        </ng-container><ng-container *ngIf="!(cases()?.length)">
           <tr><td colspan="8">No cases yet.</td></tr>
-        }
+        </ng-container>
       </tbody>
     </table>
   </div>

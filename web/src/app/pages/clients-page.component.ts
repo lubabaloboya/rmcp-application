@@ -19,8 +19,7 @@ import { environment } from '../../environments/environment';
   selector: 'app-clients-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './clients-page.component.html',
-  styleUrl: './clients-page.component.scss'
+  templateUrl: './clients-page.component.html', styleUrls: ['./clients-page.component.scss']
 })
 export class ClientsPageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
@@ -551,3 +550,5 @@ export class ClientsPageComponent implements OnInit {
     });
   }
 }
+
+

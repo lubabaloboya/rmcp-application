@@ -53,6 +53,11 @@ export const routes: Routes = [
 		loadComponent: () => import('./pages/roles-page.component').then((m) => m.RolesPageComponent),
 	},
 	{
+		path: 'users',
+		canActivate: [authGuard, adminGuard],
+		loadComponent: () => import('./pages/users-page.component').then((m) => m.UsersPageComponent),
+	},
+	{
 		path: 'compliance-automation',
 		canActivate: [authGuard, permissionGuard('roles.view')],
 		loadComponent: () => import('./pages/compliance-automation-page.component').then((m) => m.ComplianceAutomationPageComponent),

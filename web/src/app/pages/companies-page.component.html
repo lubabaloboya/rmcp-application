@@ -1,97 +1,72 @@
 
-<div class="container-fluid px-0">
-  <div class="row justify-content-center">
-    <div class="col-12 col-md-10 col-lg-8">
-      <section class="panel hero mb-4">
-        <div class="hero-tip">
-          <strong>Tip:</strong>
-          Registration and tax numbers help improve downstream case and governance quality.
-        </div>
-      </section>
-      <section class="panel summary-grid mb-4">
-        <div class="row text-center">
-          <div class="col-12 col-sm-4 mb-3 mb-sm-0">
-            <article>
-              <h3>Total Companies</h3>
-              <p class="metric">{{ totalCount() }}</p>
-            </article>
-          </div>
-          <div class="col-12 col-sm-4 mb-3 mb-sm-0">
-            <article>
-              <h3>With Email</h3>
-              <p class="metric">{{ withEmailCount() }}</p>
-            </article>
-          </div>
-          <div class="col-12 col-sm-4">
-            <article>
-              <h3>With Industry</h3>
-              <p class="metric">{{ withIndustryCount() }}</p>
-            </article>
-          </div>
-        </div>
-      </section>
+<section class="panel hero">
+  <div>
+    <h2>Companies</h2>
+    <p>Manage corporate entities linked to clients and cases.</p>
+  </div>
+  <div class="hero-tip">
+    <strong>Tip:</strong>
+    Registration and tax numbers help improve downstream case and governance quality.
+  </div>
+</section>
 
-      <section class="panel mb-4">
-        <h3>{{ editingId() ? 'Edit Company' : 'Create Company' }}</h3>
-        <form [formGroup]="form" (ngSubmit)="saveCompany()">
-          <div class="row g-3">
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Company Name
-                <input type="text" class="form-control" formControlName="company_name" [class.is-invalid]="isFieldInvalid('company_name')" />
-                @if (isFieldInvalid('company_name')) {
-                  <span class="invalid-feedback d-block">{{ fieldError('company_name') }}</span>
-                }
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Registration Number
-                <input type="text" class="form-control" formControlName="registration_number" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Tax Number
-                <input type="text" class="form-control" formControlName="tax_number" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Industry
-                <input type="text" class="form-control" formControlName="industry" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Phone
-                <input type="text" class="form-control" formControlName="phone" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Email
-                <input type="email" class="form-control" formControlName="email" [class.is-invalid]="isFieldInvalid('email')" />
-                @if (isFieldInvalid('email')) {
-                  <span class="invalid-feedback d-block">{{ fieldError('email') }}</span>
-                }
-              </label>
-            </div>
-            <div class="col-12">
-              <label class="form-label">Address
-                <input type="text" class="form-control" formControlName="address" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Country
-                <input type="text" class="form-control" formControlName="country" />
-              </label>
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label">Notes
-                <input type="text" class="form-control" formControlName="notes" />
-              </label>
-            </div>
-          </div>
-          <div class="mt-3 text-end">
-            <button type="submit" class="btn btn-primary">{{ editingId() ? 'Update' : 'Create' }}</button>
-          </div>
-        </form>
-      </section>
+<section class="panel summary-grid">
+  <article>
+    <h3>Total Companies</h3>
+    <p class="metric">{{ totalCount() }}</p>
+  </article>
+  <article>
+    <h3>With Email</h3>
+    <p class="metric">{{ withEmailCount() }}</p>
+  </article>
+  <article>
+    <h3>With Industry</h3>
+    <p class="metric">{{ withIndustryCount() }}</p>
+  </article>
+</section>
+
+<section class="panel">
+  <h3>{{ editingId() ? 'Edit Company' : 'Create Company' }}</h3>
+  <form [formGroup]="form" (ngSubmit)="saveCompany()">
+    <div class="form-grid">
+      <label>Company Name
+        <input type="text" formControlName="company_name" [class.invalid]="isFieldInvalid('company_name')" />
+        <ng-container *ngIf="isFieldInvalid('company_name')"><span class="field-error">{{ fieldError('company_name') }}</span></ng-container>
+      </label>
+      <label>Registration Number
+        <input type="text" formControlName="registration_number" />
+      </label>
+      <label>Tax Number
+        <input type="text" formControlName="tax_number" />
+      </label>
+      <label>Industry
+        <input type="text" formControlName="industry" />
+      </label>
+      <label>Phone
+        <input type="text" formControlName="phone" />
+      </label>
+      <label>Email
+        <input type="email" formControlName="email" [class.invalid]="isFieldInvalid('email')" />
+        <ng-container *ngIf="isFieldInvalid('email')"><span class="field-error">{{ fieldError('email') }}</span></ng-container>
+      </label>
+      <label class="full-width">Address
+        <input type="text" formControlName="address" />
+      </label>
+      <label>Country
+        <input type="text" formControlName="country" />
+      </label>
+      <label>Notes
+        <input type="text" formControlName="notes" />
+      </label>
+    </div>
+    <div class="actions">
+      <button type="submit">{{ editingId() ? 'Update' : 'Create' }}</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="toolbar">
     <input type="text" [value]="searchTerm()" (input)="setSearch($any($event.target).value)" placeholder="Search by name, registration, tax, industry, or email" />
     <select [value]="sortBy()" (change)="setSortBy($any($event.target).value)">
       <option value="company_name">Sort: Name</option>
@@ -114,9 +89,7 @@
     <button type="button" class="ghost" (click)="clearSearch()">Clear</button>
   </div>
 
-  @if (loading()) {
-    <p>Loading companies...</p>
-  }
+  <ng-container *ngIf="loading()"><p>Loading companies...</p></ng-container>
 
   <div class="table-wrap">
     <table>
@@ -132,7 +105,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (company of companies(); track company.id) {
+        <ng-container *ngFor="let company of companies()">
           <tr>
             <td>{{ company.company_name }}</td>
             <td>{{ company.registration_number || '-' }}</td>
@@ -147,11 +120,12 @@
               </button>
             </td>
           </tr>
-        } @empty {
+        </ng-container>
+        <ng-container *ngIf="!(companies()?.length)">
           <tr>
             <td colspan="7">No companies found for this page/filter.</td>
           </tr>
-        }
+        </ng-container>
       </tbody>
     </table>
   </div>
@@ -163,3 +137,4 @@
       <button type="button" [disabled]="currentPage() >= lastPage()" (click)="goToNextPage()">Next</button>
     </div>
   </div>
+</section>

@@ -3,7 +3,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RoleRecord, RmcpApiService } from '../core/rmcp-api.service';
 import { ToastService } from '../core/toast.service';
 
-@Component({ selector: 'app-roles-page', standalone: true, imports: [CommonModule], templateUrl: './roles-page.component.html', styleUrl: './roles-page.component.scss' })
+@Component({ selector: 'app-roles-page', standalone: true, imports: [CommonModule], templateUrl: './roles-page.component.html', styleUrls: ['./roles-page.component.scss'] })
 export class RolesPageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
   private readonly toast = inject(ToastService);
@@ -56,3 +56,5 @@ export class RolesPageComponent implements OnInit {
     });
   }
 }
+
+

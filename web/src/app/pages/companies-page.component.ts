@@ -18,8 +18,7 @@ interface CompanyCrudPayload {
   selector: 'app-companies-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './companies-page.component.html',
-  styleUrl: './companies-page.component.scss'
+  templateUrl: './companies-page.component.html', styleUrls: ['./companies-page.component.scss']
 })
 export class CompaniesPageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
@@ -235,3 +234,5 @@ export class CompaniesPageComponent implements OnInit {
     return '';
   }
 }
+
+

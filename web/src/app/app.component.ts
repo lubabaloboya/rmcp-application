@@ -11,14 +11,9 @@ import { ToastContainerComponent } from './shared/toast-container.component';
   selector: 'app-root',
   imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, ToastContainerComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-    sidebarOpen = false;
-
-    isMobile(): boolean {
-      return window.innerWidth <= 760;
-    }
   private readonly auth = inject(AuthService);
   private readonly loading = inject(LoadingService);
   private readonly router = inject(Router);
@@ -31,6 +26,15 @@ export class AppComponent implements OnInit {
   readonly userName = this.auth.userName;
   readonly isProcessing = this.loading.isLoading;
   readonly booting = signal(true);
+  readonly sidebarOpen = signal(false);
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update(v => !v);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
+  }
 
   constructor() {
     merge(
@@ -85,6 +89,32 @@ export class AppComponent implements OnInit {
     }, this.idleTimeoutMs);
   }
 
+  readonly recentActivities = signal([
+    { icon: 'fas fa-user-plus', description: 'New client added', time: '2m ago' },
+    { icon: 'fas fa-briefcase', description: 'Case escalated', time: '5m ago' },
+    { icon: 'fas fa-tasks', description: 'Task completed', time: '10m ago' },
+  ]);
+
+  readonly notifications = signal([
+    { icon: 'fas fa-exclamation-triangle', message: 'Document expiring soon', time: '1h ago' },
+    { icon: 'fas fa-envelope', message: 'New communication received', time: '2h ago' },
+  ]);
+
+  getTotalClients(): number {
+    // Placeholder - in real app, fetch from service
+    return 42;
+  }
+
+  getActiveCases(): number {
+    // Placeholder
+    return 8;
+  }
+
+  getPendingTasks(): number {
+    // Placeholder
+    return 15;
+  }
+
   private clearIdleTimer(): void {
     if (this.idleTimer) {
       clearTimeout(this.idleTimer);
@@ -92,3 +122,4 @@ export class AppComponent implements OnInit {
     }
   }
 }
+

@@ -9,8 +9,7 @@ import { ToastService } from '../core/toast.service';
   selector: 'app-login-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './login-page.component.html',
-  styleUrl: './login-page.component.scss'
+  templateUrl: './login-page.component.html', styleUrls: ['./login-page.component.scss']
 })
 export class LoginPageComponent {
   private readonly auth = inject(AuthService);
@@ -22,8 +21,8 @@ export class LoginPageComponent {
   readonly errorMessage = signal('');
 
   readonly form = this.fb.nonNullable.group({
-    email: ['admin@rmcp.local', [Validators.required, Validators.email]],
-    password: ['Admin@12345', [Validators.required]],
+    email: ['officer@rmcp.local', [Validators.required, Validators.email]],
+    password: ['Officer@12345', [Validators.required]],
   });
 
   login(): void {
@@ -49,3 +48,5 @@ export class LoginPageComponent {
     });
   }
 }
+
+

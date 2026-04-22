@@ -7,7 +7,7 @@ import { DashboardData, RmcpApiService } from '../core/rmcp-api.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './dashboard-page.component.html',
-  styleUrl: './dashboard-page.component.scss'
+  styleUrls: ['./dashboard-page.component.scss']
 })
 export class DashboardPageComponent implements OnInit {
   private readonly api = inject(RmcpApiService);
