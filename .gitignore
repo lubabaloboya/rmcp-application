@@ -46,6 +46,8 @@ api/storage/framework/views/
 api/bootstrap/cache/*.php
 
 # Node / Angular
+node_modules/
+package-lock.json
 web/node_modules/
 web/dist/
 web/.angular/
