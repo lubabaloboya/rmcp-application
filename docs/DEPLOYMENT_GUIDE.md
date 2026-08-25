@@ -4,7 +4,7 @@
 
 - Ubuntu 20.04+ VM (Google Cloud, AWS, etc.)
 - sudo/root access
-- Open firewall ports: 80 (HTTP), 443 (HTTPS), 4200 (Angular), 8000/8080 (API), 1433 (SQL Server), 8025 (Mailhog), 8978 (CloudBeaver)
+- Open firewall ports: 80 (HTTP), 443 (HTTPS), 4200 (Angular), 8080 (API), 1433 (SQL Server), 8025 (Mailhog), 8978 (CloudBeaver)
 - Domain name (optional, for SSL)
 
 ### Software
@@ -85,11 +85,11 @@ sudo docker compose up -d --build
 4. [Restart nginx.]
 
 ## 11. Open Firewall Ports
-- Ensure ports 80, 443, 4200, 8000, etc. are open in your cloud firewall.
+- Ensure ports 80, 443, 4200, 8080, etc. are open in your cloud firewall.
 
 ## 12. Access Your App
 - Angular frontend: `http://<your-domain-or-ip>:4200`
-- API: `http://<your-domain-or-ip>/api/v1`
+- API: `http://<your-domain-or-ip>:8080/api/v1`
 - MailHog: `http://<your-domain-or-ip>:8025/`
 - CloudBeaver: `http://<your-domain-or-ip>:8978/`
 
@@ -100,12 +100,11 @@ sudo docker compose up -d --build
 - **Database errors:** Check SQL Server container logs and volume permissions.
 
 ---
-For more details, see README.md and docs/DEVELOPER_GUIDE.md.
-- API: `http://<your-external-ip>:8080/api/v1`
+For more details, see [README](../README.md) and the [Developer guide](DEVELOPER_GUIDE.md).
 
 ---
 
-# Important Docker & Deployment Commands
+## Important Docker and Deployment Commands
 
 - **Check running containers:**
   ```sh
@@ -140,7 +139,7 @@ For more details, see README.md and docs/DEVELOPER_GUIDE.md.
 
 ---
 
-# Enabling Google Network Management API
+## Enabling Google Network Management API
 
 If you encounter the error:
 
@@ -159,7 +158,7 @@ Follow these steps:
 
 ---
 
-# Enabling Cloud Identity-Aware Proxy API
+## Enabling Cloud Identity-Aware Proxy API
 
 If you encounter the error:
 
@@ -178,7 +177,7 @@ Follow these steps:
 
 ---
 
-# Troubleshooting & Fixes
+## Troubleshooting and Fixes
 
 ## 1. **App not accessible from browser**
 - Check firewall rules for open ports (80, 443, 8080, 4200, etc.).
@@ -225,14 +224,14 @@ Follow these steps:
 
 ---
 
-# Tips
+## Tips
 - Always rebuild the Angular app after changing `environment.prod.ts`.
 - Use incognito mode or clear cache after redeploying frontend.
 - For production, consider using a reverse proxy (Nginx) and HTTPS.
 
 ---
 
-# Laravel .env Setup for Docker Deployment
+## Laravel .env Setup for Docker Deployment
 
 1. Navigate to your api directory:
    ```sh

@@ -18,6 +18,8 @@ class ClientController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Client::class);
+
         $perPage = (int) $request->integer('per_page', 15);
         $perPage = max(5, min($perPage, 100));
 
@@ -26,6 +28,8 @@ class ClientController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Client::class);
+
         $validated = $request->validate([
             'company_id' => ['nullable', 'integer', 'exists:companies,id'],
             'client_type' => ['required', 'in:individual,company'],
@@ -44,6 +48,9 @@ class ClientController extends Controller
             'wealth_profile_status' => ['nullable', 'in:pending,in_review,approved,rejected'],
         ]);
 
+        $validated['company_id'] = $this->normalizeCompanyId($validated['company_id'] ?? null);
+        $this->assertCompanyScope($validated['company_id']);
+
         $client = Client::create($validated);
         $this->riskAutomation->reassess($client, [], 'profile_created');
 
@@ -52,6 +59,8 @@ class ClientController extends Controller
 
     public function bulkStore(Request $request): JsonResponse
     {
+        $this->authorize('create', Client::class);
+
         $validated = $request->validate([
             'default_company_id' => ['nullable', 'integer', 'exists:companies,id'],
             'rows' => ['required', 'array', 'min:1', 'max:1000'],
@@ -84,6 +93,8 @@ class ClientController extends Controller
                 $payload['client_type'] = 'company';
             }
 
+            $payload['company_id'] = $this->normalizeCompanyId($payload['company_id']);
+
             $rowValidator = Validator::make($payload, [
                 'company_id' => ['nullable', 'integer', 'exists:companies,id'],
                 'client_type' => ['required', 'in:individual,company'],
@@ -110,6 +121,7 @@ class ClientController extends Controller
                 continue;
             }
 
+            $this->assertCompanyScope($payload['company_id'] ?? null);
             $toCreate[] = $rowValidator->validated();
         }
 
@@ -135,11 +147,15 @@ class ClientController extends Controller
 
     public function show(Client $client): JsonResponse
     {
+        $this->authorize('view', $client);
+
         return response()->json($client->load('riskAssessment'));
     }
 
     public function update(Request $request, Client $client): JsonResponse
     {
+        $this->authorize('update', $client);
+
         $validated = $request->validate([
             'first_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
@@ -163,8 +179,44 @@ class ClientController extends Controller
 
     public function destroy(Client $client): JsonResponse
     {
+        $this->authorize('delete', $client);
+
         $client->delete();
 
         return response()->json(null, 204);
+    }
+
+    private function assertCompanyScope(?int $companyId): void
+    {
+        $user = auth('api')->user();
+
+        if (! $user) {
+            abort(401, 'Unauthenticated.');
+        }
+
+        if ($user->company_id === null) {
+            return;
+        }
+
+        if ($companyId === null) {
+            abort(403, 'Forbidden.');
+        }
+
+        abort_unless((int) $user->company_id === (int) $companyId, 403, 'Forbidden.');
+    }
+
+    private function normalizeCompanyId(?int $companyId): ?int
+    {
+        $user = auth('api')->user();
+
+        if (! $user) {
+            abort(401, 'Unauthenticated.');
+        }
+
+        if ($user->company_id !== null && $companyId === null) {
+            return (int) $user->company_id;
+        }
+
+        return $companyId;
     }
 }

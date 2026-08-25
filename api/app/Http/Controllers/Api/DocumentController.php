@@ -28,6 +28,8 @@ class DocumentController extends Controller
 
     public function index(Client $client): JsonResponse
     {
+        $this->authorize('view', $client);
+
         $documents = Document::query()
             ->where('client_id', $client->id)
             ->with('type:id,document_name,category')
@@ -40,6 +42,8 @@ class DocumentController extends Controller
 
     public function store(Request $request, Client $client): JsonResponse
     {
+        $this->authorize('update', $client);
+
         $validated = $request->validate([
             'document_type_id' => ['required', 'integer', 'exists:document_types,id'],
             'expiry_date' => ['nullable', 'date'],
@@ -71,6 +75,8 @@ class DocumentController extends Controller
 
     public function replace(Request $request, Document $document): JsonResponse
     {
+        $this->authorize('update', $document);
+
         $validated = $request->validate([
             'document_type_id' => ['nullable', 'integer', 'exists:document_types,id'],
             'expiry_date' => ['nullable', 'date'],
@@ -108,6 +114,8 @@ class DocumentController extends Controller
 
     public function destroy(Document $document): JsonResponse
     {
+        $this->authorize('delete', $document);
+
         $this->recordVersion($document, 'deleted');
 
         if (Storage::disk('local')->exists($document->file_path)) {
@@ -121,6 +129,8 @@ class DocumentController extends Controller
 
     public function download(Document $document)
     {
+        $this->authorize('view', $document);
+
         abort_unless(Storage::disk('local')->exists($document->file_path), 404, 'File not found.');
 
         return response()->download(
@@ -131,6 +141,8 @@ class DocumentController extends Controller
 
     public function versions(Document $document): JsonResponse
     {
+        $this->authorize('view', $document);
+
         $history = DocumentVersion::query()
             ->where('document_id', $document->id)
             ->orderByDesc('id')

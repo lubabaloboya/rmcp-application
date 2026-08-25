@@ -20,6 +20,13 @@ This guide describes how developers run, understand, and extend RMCP.
 
 ## 3. Local Run (Docker)
 
+Before first start, copy Docker env template and set a strong SQL Server password:
+
+```powershell
+Copy-Item .env.docker.example .env
+# Edit .env and set MSSQL_SA_PASSWORD
+```
+
 From repository root:
 
 ```powershell
@@ -76,12 +83,29 @@ docker compose restart web
 - Me endpoint: `GET /api/v1/auth/me`
 - Logout endpoint: `POST /api/v1/auth/logout`
 
+Auth and API abuse protections:
+- `POST /api/v1/auth/login` and `POST /api/v1/auth/register` are throttled (`throttle:auth`)
+- `/api/v1/*` routes are globally throttled (`throttle:api`)
+- `POST /api/v1/clients/bulk` has extra throttle protection (`throttle:bulk-imports`)
+
+Rate limit env controls:
+- `API_RATE_LIMIT_PER_MINUTE`
+- `AUTH_RATE_LIMIT_PER_MINUTE`
+- `BULK_IMPORT_RATE_LIMIT_PER_MINUTE`
+
 Backend controller: `api/app/Http/Controllers/Api/AuthController.php`
 
 ### Permission Model
 
 Permissions are attached to roles, then enforced by middleware:
 - Example route guard: `->middleware('permission:clients.view')`
+
+Resource ownership is also policy-enforced for key entities:
+- `ClientPolicy`
+- `DocumentPolicy`
+- `RmcpCasePolicy`
+
+This adds company-scope checks on top of role permissions for client, document, and case access.
 
 Main permission list:
 - `api/config/rmcp.php`
@@ -210,13 +234,24 @@ docker compose logs --tail=200 mssql
 docker compose logs --tail=200 api
 ```
 
+### Docker compose fails with missing MSSQL_SA_PASSWORD
+
+Set the required env variable and restart:
+
+```powershell
+Copy-Item .env.docker.example .env
+# Edit .env and set MSSQL_SA_PASSWORD
+docker compose up -d --build
+```
+
 ## 13. Contribution Notes
 
 - Keep backend route permission checks explicit.
 - Keep Angular guards aligned with backend permissions.
 - Prefer minimal focused patches to avoid regressions.
 - Validate after infra changes (API/web health, auth login probe, key workflows).
-## 7.1 Compliance Automation Page Improvements
+
+## 14. Compliance Automation Page Improvements
 
 The Angular component for the Compliance Automation page (`web/src/app/pages/compliance-automation-page.component.ts` and `.html`) now includes:
 - **Summary cards** for quick compliance stats (rules, clients, checklist types)

@@ -21,9 +21,9 @@ use App\Http\Controllers\Api\ShareholderController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
 
-Route::prefix('v1')->group(function (): void {
-    Route::post('/auth/register', [AuthController::class, 'register']);
-    Route::post('/auth/login', [AuthController::class, 'login']);
+Route::prefix('v1')->middleware('throttle:api')->group(function (): void {
+    Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:auth');
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:auth');
 
     Route::middleware('auth:api')->group(function (): void {
         Route::get('/auth/me', [AuthController::class, 'me']);
@@ -86,7 +86,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/document-checklists', [DocumentChecklistController::class, 'index'])->middleware('permission:documents.view');
         Route::put('/document-checklists/{clientType}', [DocumentChecklistController::class, 'replaceForClientType'])->middleware('permission:documents.edit');
 
-        Route::post('/clients/bulk', [ClientController::class, 'bulkStore'])->middleware('permission:clients.create');
+        Route::post('/clients/bulk', [ClientController::class, 'bulkStore'])->middleware(['permission:clients.create', 'throttle:bulk-imports']);
         Route::get('/clients', [ClientController::class, 'index'])->middleware('permission:clients.view');
         Route::post('/clients', [ClientController::class, 'store'])->middleware('permission:clients.create');
         Route::get('/clients/{client}', [ClientController::class, 'show'])->middleware('permission:clients.view');

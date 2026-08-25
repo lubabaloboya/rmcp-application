@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Client;
 use App\Models\RmcpCase;
 use App\Services\AuditLogService;
 use App\Services\DocumentGovernanceService;
@@ -18,6 +19,8 @@ class CaseController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', RmcpCase::class);
+
         $validated = $request->validate([
             'status' => ['nullable', 'string'],
             'stage' => ['nullable', 'string'],
@@ -31,6 +34,11 @@ class CaseController extends Controller
         $query = RmcpCase::query()
             ->with(['client:id,first_name,last_name,client_type', 'maker:id,name', 'checker:id,name'])
             ->latest('id');
+
+        $user = auth('api')->user();
+        if ($user && $user->company_id !== null) {
+            $query->whereHas('client', fn ($clientQuery) => $clientQuery->where('company_id', (int) $user->company_id));
+        }
 
         if (! empty($validated['status'])) {
             $query->where('status', $validated['status']);
@@ -50,6 +58,8 @@ class CaseController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', RmcpCase::class);
+
         $validated = $request->validate([
             'client_id' => ['required', 'integer', 'exists:clients,id'],
             'title' => ['required', 'string', 'max:255'],
@@ -57,6 +67,9 @@ class CaseController extends Controller
             'checker_id' => ['nullable', 'integer', 'exists:users,id'],
             'sla_due_at' => ['nullable', 'date'],
         ]);
+
+        $client = Client::query()->findOrFail((int) $validated['client_id']);
+        $this->authorize('view', $client);
 
         $case = RmcpCase::query()->create([
             ...$validated,
@@ -74,6 +87,8 @@ class CaseController extends Controller
 
     public function update(Request $request, RmcpCase $case): JsonResponse
     {
+        $this->authorize('update', $case);
+
         $validated = $request->validate([
             'title' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -90,6 +105,8 @@ class CaseController extends Controller
 
     public function submitForReview(RmcpCase $case): JsonResponse
     {
+        $this->authorize('update', $case);
+
         if (! $this->canSubmitForReview($case)) {
             return response()->json([
                 'message' => 'Only draft or rejected cases can be submitted for review.',
@@ -112,6 +129,8 @@ class CaseController extends Controller
 
     public function startEnhancedDueDiligence(RmcpCase $case): JsonResponse
     {
+        $this->authorize('update', $case);
+
         if (! $this->canStartEdd($case)) {
             return response()->json(['message' => 'Only pending review cases can start EDD.'], 422);
         }
@@ -131,6 +150,8 @@ class CaseController extends Controller
 
     public function approve(Request $request, RmcpCase $case): JsonResponse
     {
+        $this->authorize('update', $case);
+
         $validated = $request->validate([
             'review_notes' => ['nullable', 'string'],
         ]);
@@ -162,6 +183,8 @@ class CaseController extends Controller
 
     public function reject(Request $request, RmcpCase $case): JsonResponse
     {
+        $this->authorize('update', $case);
+
         $validated = $request->validate([
             'review_notes' => ['required', 'string'],
         ]);
@@ -189,6 +212,8 @@ class CaseController extends Controller
 
     public function close(RmcpCase $case): JsonResponse
     {
+        $this->authorize('update', $case);
+
         if (! $this->canClose($case)) {
             return response()->json(['message' => 'Only approved cases can be closed.'], 422);
         }
